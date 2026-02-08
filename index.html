@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rate My SLO Landlord - San Luis Obispo Rental Reviews</title>
+  <meta name="description" content="Find honest reviews of landlords and rental properties in San Luis Obispo. Read reviews from real tenants before signing your lease." />
+
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
+</head>
+
+<body>
+  <!-- Top Nav -->
+  <header class="topbar">
+    <div class="container topbar__inner">
+      <a class="brand" href="/">
+        <span class="brand__icon">🏠</span>
+        <span class="brand__name">Rate My SLO Landlord</span>
+      </a>
+
+      <nav class="nav">
+        <a class="nav__link" href="#search">Find Rentals</a>
+        <span class="nav__sep">|</span>
+        <a class="nav__link" href="#reviews">Write a Review</a>
+        <span class="nav__sep">|</span>
+        <a class="nav__link" href="#about">About</a>
+        <button class="menu" aria-label="Open menu" title="Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <main>
+    <section class="hero" id="search">
+      <div class="hero__bg" role="img" aria-label="San Luis Obispo aerial view"></div>
+
+      <div class="container hero__content">
+        <h1 class="hero__headline">Find Your Perfect<br>SLO Rental</h1>
+        <p class="hero__tagline">Honest reviews from real tenants in San Luis Obispo</p>
+
+        <!-- Search bar -->
+        <form class="search" action="#" method="get">
+          <div class="search__pill">
+            <input
+              class="search__input"
+              type="text"
+              name="q"
+              placeholder="Search by address, landlord, or property name..."
+              aria-label="Search properties"
+            />
+
+            <div class="search__divider" aria-hidden="true"></div>
+
+            <label class="search__label">
+              <span class="sr-only">Price</span>
+              <select class="search__select" name="price">
+                <option value="">Price Range</option>
+                <option value="0-1500">Under $1,500</option>
+                <option value="1500-2000">$1,500 - $2,000</option>
+                <option value="2000-2500">$2,000 - $2,500</option>
+                <option value="2500-3000">$2,500 - $3,000</option>
+                <option value="3000+">$3,000+</option>
+              </select>
+              <span class="chev" aria-hidden="true">▾</span>
+            </label>
+
+            <div class="search__divider" aria-hidden="true"></div>
+
+            <label class="search__label">
+              <span class="sr-only">Beds and baths</span>
+              <select class="search__select" name="beds_baths">
+                <option value="">Beds + Baths</option>
+                <option value="studio">Studio</option>
+                <option value="1_1">1 bed / 1 bath</option>
+                <option value="2_1">2 bed / 1 bath</option>
+                <option value="2_2">2 bed / 2 bath</option>
+                <option value="3_2">3+ bed / 2+ bath</option>
+              </select>
+              <span class="chev" aria-hidden="true">▾</span>
+            </label>
+
+            <button class="search__go" type="submit" aria-label="Search">
+              →
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="stats">
+      <div class="container stats__inner">
+        <div class="stat">
+          <span class="stat__num">500+</span>
+          <span class="stat__label">Properties Reviewed</span>
+        </div>
+        <div class="stat">
+          <span class="stat__num">1,200+</span>
+          <span class="stat__label">Tenant Reviews</span>
+        </div>
+        <div class="stat">
+          <span class="stat__num">150+</span>
+          <span class="stat__label">Landlords Listed</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Explore -->
+    <section class="section">
+      <div class="container">
+        <h2 class="section__title">Explore SLO Rentals</h2>
+        <p class="section__sub">Browse rental listings across San Luis Obispo neighborhoods</p>
+
+        <div class="mapwrap">
+          <div class="map" role="img" aria-label="Map of San Luis Obispo rentals">
+            <div class="map__badge">SLO RENTALS</div>
+
+            <!-- Neighborhood markers -->
+            <span class="dot" style="left: 18%; top: 32%" title="Cal Poly Area"></span>
+            <span class="dot" style="left: 28%; top: 45%" title="Downtown"></span>
+            <span class="dot" style="left: 42%; top: 38%" title="Laguna Lake"></span>
+            <span class="dot" style="left: 55%; top: 52%" title="Irish Hills"></span>
+            <span class="dot" style="left: 68%; top: 35%" title="Johnson Ave"></span>
+            <span class="dot" style="left: 78%; top: 48%" title="Broad Street"></span>
+            <span class="dot" style="left: 35%; top: 62%" title="SLO Airport Area"></span>
+          </div>
+        </div>
+
+        <div class="neighborhoods">
+          <a href="#" class="neighborhood">Cal Poly Area</a>
+          <a href="#" class="neighborhood">Downtown</a>
+          <a href="#" class="neighborhood">Laguna Lake</a>
+          <a href="#" class="neighborhood">Irish Hills</a>
+          <a href="#" class="neighborhood">Johnson Ave</a>
+          <a href="#" class="neighborhood">Broad Street</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Best Rated -->
+    <section class="section section--muted">
+      <div class="container">
+        <h2 class="section__title">Top Rated Properties</h2>
+        <p class="section__sub">Highest rated rentals in San Luis Obispo based on tenant reviews</p>
+
+        <div class="cards">
+          <!-- Card 1 -->
+          <article class="card">
+            <div class="card__meta">
+              <div>
+                <h3 class="card__title">Mustang Village</h3>
+                <p class="card__sub">24 Reviews</p>
+              </div>
+              <div class="rating rating--high">
+                <span class="rating__num">4.5</span>
+              </div>
+            </div>
+            <div class="card__img card__img--1" role="img" aria-label="Mustang Village apartments"></div>
+            <div class="card__tags">
+              <span class="tag">Near Cal Poly</span>
+              <span class="tag">Student Friendly</span>
+            </div>
+          </article>
+
+          <!-- Card 2 -->
+          <article class="card">
+            <div class="card__meta">
+              <div>
+                <h3 class="card__title">Downtown Lofts</h3>
+                <p class="card__sub">18 Reviews</p>
+              </div>
+              <div class="rating rating--high">
+                <span class="rating__num">4.3</span>
+              </div>
+            </div>
+            <div class="card__img card__img--2" role="img" aria-label="Downtown Lofts"></div>
+            <div class="card__tags">
+              <span class="tag">Downtown</span>
+              <span class="tag">Walkable</span>
+            </div>
+          </article>
+
+          <!-- Card 3 -->
+          <article class="card">
+            <div class="card__meta">
+              <div>
+                <h3 class="card__title">Laguna Lake Townhomes</h3>
+                <p class="card__sub">15 Reviews</p>
+              </div>
+              <div class="rating rating--med">
+                <span class="rating__num">3.8</span>
+              </div>
+            </div>
+            <div class="card__img card__img--3" role="img" aria-label="Laguna Lake Townhomes"></div>
+            <div class="card__tags">
+              <span class="tag">Family Friendly</span>
+              <span class="tag">Quiet</span>
+            </div>
+          </article>
+
+          <!-- Card 4 -->
+          <article class="card">
+            <div class="card__meta">
+              <div>
+                <h3 class="card__title">Foothill Gardens</h3>
+                <p class="card__sub">12 Reviews</p>
+              </div>
+              <div class="rating rating--med">
+                <span class="rating__num">3.6</span>
+              </div>
+            </div>
+            <div class="card__img card__img--4" role="img" aria-label="Foothill Gardens"></div>
+            <div class="card__tags">
+              <span class="tag">Pet Friendly</span>
+              <span class="tag">Parking</span>
+            </div>
+          </article>
+        </div>
+
+        <div class="cta-row">
+          <a href="#" class="btn btn--outline">View All Properties</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Write Review CTA -->
+    <section class="section section--cta" id="reviews">
+      <div class="container cta__inner">
+        <div class="cta__text">
+          <h2 class="cta__title">Share Your Experience</h2>
+          <p class="cta__desc">Help fellow renters make informed decisions. Your honest review can save someone from a bad landlord or help them find a great one.</p>
+          <a href="#" class="btn">Write a Review</a>
+        </div>
+        <div class="cta__graphic">
+          <div class="review-preview">
+            <div class="review-preview__stars">★★★★☆</div>
+            <p class="review-preview__text">"Great landlord, always responsive to maintenance requests. The apartment was clean and well-maintained..."</p>
+            <span class="review-preview__author">- Recent SLO Tenant</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="section" id="about">
+      <div class="container">
+        <h2 class="section__title">How It Works</h2>
+        <p class="section__sub">Finding the right rental in SLO shouldn't be a gamble</p>
+
+        <div class="steps">
+          <div class="step">
+            <div class="step__icon">🔍</div>
+            <h3 class="step__title">Search</h3>
+            <p class="step__desc">Browse properties by location, price, or landlord name</p>
+          </div>
+          <div class="step">
+            <div class="step__icon">📖</div>
+            <h3 class="step__title">Read Reviews</h3>
+            <p class="step__desc">See honest feedback from current and past tenants</p>
+          </div>
+          <div class="step">
+            <div class="step__icon">✍️</div>
+            <h3 class="step__title">Share</h3>
+            <p class="step__desc">Write your own review to help the SLO community</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Recent Reviews -->
+    <section class="section section--muted">
+      <div class="container">
+        <h2 class="section__title">Recent Reviews</h2>
+        <p class="section__sub">What tenants are saying about SLO rentals</p>
+
+        <div class="reviews">
+          <article class="review">
+            <div class="review__header">
+              <span class="review__property">Valencia Apartments</span>
+              <span class="review__rating">★★★★☆ 4.0</span>
+            </div>
+            <p class="review__text">"Solid place to live near campus. Management is decent, they fixed my AC within a day when it broke. Parking can be tight but overall no major complaints."</p>
+            <div class="review__footer">
+              <span class="review__date">2 days ago</span>
+              <span class="review__verified">Verified Tenant</span>
+            </div>
+          </article>
+
+          <article class="review">
+            <div class="review__header">
+              <span class="review__property">Broad Street Commons</span>
+              <span class="review__rating">★★☆☆☆ 2.0</span>
+            </div>
+            <p class="review__text">"Be careful with this property. Took 3 weeks to get hot water fixed and they tried to keep my entire deposit for normal wear and tear. Document everything."</p>
+            <div class="review__footer">
+              <span class="review__date">5 days ago</span>
+              <span class="review__verified">Verified Tenant</span>
+            </div>
+          </article>
+
+          <article class="review">
+            <div class="review__header">
+              <span class="review__property">Chorro Street Studios</span>
+              <span class="review__rating">★★★★★ 5.0</span>
+            </div>
+            <p class="review__text">"Best landlord I've had in SLO! Always responds quickly, respects privacy, and returned full deposit. Highly recommend for anyone looking downtown."</p>
+            <div class="review__footer">
+              <span class="review__date">1 week ago</span>
+              <span class="review__verified">Verified Tenant</span>
+            </div>
+          </article>
+        </div>
+
+        <div class="cta-row">
+          <a href="#" class="btn btn--outline">Read More Reviews</a>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="container footer__inner">
+        <div class="footer__brand">
+          <span class="brand__icon">🏠</span>
+          <span>Rate My SLO Landlord</span>
+        </div>
+        <div class="footer__links">
+          <a href="#" class="footer__link">About Us</a>
+          <a href="#" class="footer__link">Contact</a>
+          <a href="#" class="footer__link">Privacy Policy</a>
+          <a href="#" class="footer__link">Terms of Service</a>
+        </div>
+        <div class="footer__copy">
+          © <span id="year"></span> polycribs.com - All rights reserved.
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
