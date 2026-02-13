@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Write a Review - PolyCribs</title>
+  <meta name="description" content="Write a rental review on PolyCribs. Help SLO renters make better decisions with honest, detailed feedback." />
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="container topbar__inner">
+      <a class="brand" href="index.html">
+        <span class="brand__icon">🏠</span>
+        <span class="brand__name">PolyCribs</span>
+      </a>
+
+      <nav class="nav">
+        <a class="nav__link" href="index.html#search">Find Rentals</a>
+        <span class="nav__sep">|</span>
+        <a class="nav__link" href="write-review.html" aria-current="page">Write a Review</a>
+        <span class="nav__sep">|</span>
+        <a class="nav__link" href="about.html">About</a>
+        <button class="menu" aria-label="Open menu" title="Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-hero">
+      <div class="container page-hero__inner">
+        <h1 class="page-hero__title">Write a Review</h1>
+        <p class="page-hero__sub">
+          Help other renters in San Luis Obispo. Keep it factual, specific, and useful — what happened, how long it took, and how it ended.
+        </p>
+
+        <div class="progress" aria-label="Form completion progress">
+          <div class="progress__bar" id="progressBar"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container page-grid">
+        <article class="panel">
+          <h2 class="panel__title">Review details</h2>
+
+          <form class="form" id="reviewForm" novalidate>
+            <div class="form-row">
+              <div class="field">
+                <label class="field__label" for="property">Property name</label>
+                <input class="field__control" id="property" name="property" placeholder="e.g., Mustang Village" required />
+                <p class="field__hint">If you only know the address, that’s fine.</p>
+                <p class="error-msg" id="err_property" hidden>Please enter a property name.</p>
+              </div>
+
+              <div class="field">
+                <label class="field__label" for="address">Address (optional)</label>
+                <input class="field__control" id="address" name="address" placeholder="e.g., 123 Foothill Blvd" />
+                <p class="field__hint">Don’t include unit numbers if you don’t want to.</p>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="field">
+                <label class="field__label" for="landlord">Landlord / management</label>
+                <input class="field__control" id="landlord" name="landlord" placeholder="e.g., ABC Property Mgmt" required />
+                <p class="error-msg" id="err_landlord" hidden>Please enter a landlord or management name.</p>
+              </div>
+
+              <div class="field">
+                <label class="field__label">Rating</label>
+                <div class="stars" role="group" aria-label="Star rating">
+                  <button class="starbtn" type="button" data-star="1" aria-pressed="false">★</button>
+                  <button class="starbtn" type="button" data-star="2" aria-pressed="false">★</button>
+                  <button class="starbtn" type="button" data-star="3" aria-pressed="false">★</button>
+                  <button class="starbtn" type="button" data-star="4" aria-pressed="false">★</button>
+                  <button class="starbtn" type="button" data-star="5" aria-pressed="false">★</button>
+                  <span style="font-weight:850; color: var(--gold);" id="ratingLabel">No rating</span>
+                </div>
+                <input type="hidden" id="rating" name="rating" required />
+                <p class="error-msg" id="err_rating" hidden>Please choose a rating.</p>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="field__label" for="review">Your review</label>
+              <textarea class="field__control" id="review" name="review" rows="7" placeholder="What went well? What went wrong? How was maintenance? Deposit return? Communication?" required></textarea>
+              <p class="field__hint">Aim for specifics. Example: “Hot water took 10 days to fix, multiple follow-ups, resolved after contacting…”</p>
+              <p class="error-msg" id="err_review" hidden>Please write a review (at least 40 characters).</p>
+            </div>
+
+            <div class="form-row">
+              <div class="field">
+                <label class="field__label" for="moveout">When was this?</label>
+                <select class="field__control" id="moveout" name="when" required>
+                  <option value="">Select</option>
+                  <option>Within the last month</option>
+                  <option>Last 3 months</option>
+                  <option>Last 6 months</option>
+                  <option>Last year</option>
+                  <option>More than a year ago</option>
+                </select>
+                <p class="error-msg" id="err_when" hidden>Please select when this happened.</p>
+              </div>
+
+              <div class="field">
+                <label class="field__label" for="verified">
+                  <input type="checkbox" id="verified" name="verified" />
+                  Verified tenant (I lived here)
+                </label>
+                <p class="field__hint">Optional — helps readers trust the review.</p>
+              </div>
+            </div>
+
+            <div class="cta-row" style="text-align:left">
+              <button class="btn" type="submit">Submit Review</button>
+              <button class="btn btn--outline" type="button" id="saveDraft" style="margin-left:10px">Save draft</button>
+            </div>
+          </form>
+        </article>
+
+        <aside class="panel">
+          <h2 class="panel__title">Quick guidelines</h2>
+          <p class="panel__text">Keep it useful for renters:</p>
+          <div class="kv">
+            <div class="kv__row"><span class="kv__k">Do</span><span class="kv__v">Be specific & factual</span></div>
+            <div class="kv__row"><span class="kv__k">Do</span><span class="kv__v">Mention timelines/outcomes</span></div>
+            <div class="kv__row"><span class="kv__k">Don’t</span><span class="kv__v">Post private info</span></div>
+            <div class="kv__row"><span class="kv__k">Don’t</span><span class="kv__v">Use personal attacks</span></div>
+          </div>
+
+          <div style="height:18px"></div>
+
+          <h2 class="panel__title">What happens when you submit?</h2>
+          <p class="panel__text">
+            Right now this is a full UI + “app feel” demo: validation, progress, and local draft saving.
+            When you add a backend later, the submit handler can POST to your server.
+          </p>
+        </aside>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="container footer__inner">
+        <div class="footer__brand">
+          <span class="brand__icon">🏠</span>
+          <span>PolyCribs</span>
+        </div>
+        <div class="footer__links">
+          <a href="about.html" class="footer__link">About Us</a>
+          <a href="#" class="footer__link">Contact</a>
+          <a href="#" class="footer__link">Privacy Policy</a>
+          <a href="#" class="footer__link">Terms of Service</a>
+        </div>
+        <div class="footer__copy">
+          © <span id="year"></span> polycribs.com - All rights reserved.
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    let lastScroll = 0;
+    const topbar = document.querySelector(".topbar");
+    window.addEventListener("scroll", () => {
+      const y = window.pageYOffset || document.documentElement.scrollTop;
+      if (y > lastScroll && y > 80) topbar.style.transform = "translateY(-100%)";
+      else topbar.style.transform = "translateY(0)";
+      lastScroll = y;
+    });
+
+    const form = document.getElementById("reviewForm");
+    const progressBar = document.getElementById("progressBar");
+    const toast = document.getElementById("toast");
+
+    const fields = {
+      property: document.getElementById("property"),
+      address: document.getElementById("address"),
+      landlord: document.getElementById("landlord"),
+      rating: document.getElementById("rating"),
+      review: document.getElementById("review"),
+      when: document.getElementById("moveout")
+    };
+
+    const errs = {
+      property: document.getElementById("err_property"),
+      landlord: document.getElementById("err_landlord"),
+      rating: document.getElementById("err_rating"),
+      review: document.getElementById("err_review"),
+      when: document.getElementById("err_when")
+    };
+
+    function showToast(msg){
+      toast.textContent = msg;
+      toast.classList.add("toast--show");
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => toast.classList.remove("toast--show"), 1800);
+    }
+
+    const starBtns = Array.from(document.querySelectorAll(".starbtn"));
+    const ratingLabel = document.getElementById("ratingLabel");
+
+    function setRating(n){
+      fields.rating.value = String(n);
+      starBtns.forEach(btn => {
+        const s = Number(btn.dataset.star);
+        btn.setAttribute("aria-pressed", s <= n ? "true" : "false");
+      });
+      ratingLabel.textContent = n + " / 5";
+      updateProgress();
+    }
+    starBtns.forEach(btn => btn.addEventListener("click", () => setRating(Number(btn.dataset.star))));
+
+    function markError(el, msgEl, on){
+      if(on){
+        el.classList.add("error");
+        if(msgEl) msgEl.hidden = false;
+      }else{
+        el.classList.remove("error");
+        if(msgEl) msgEl.hidden = true;
+      }
+    }
+
+    function validate(){
+      let ok = true;
+
+      markError(fields.property, errs.property, !fields.property.value.trim());
+      if(!fields.property.value.trim()) ok = false;
+
+      markError(fields.landlord, errs.landlord, !fields.landlord.value.trim());
+      if(!fields.landlord.value.trim()) ok = false;
+
+      markError(fields.when, errs.when, !fields.when.value);
+      if(!fields.when.value) ok = false;
+
+      markError(fields.rating, errs.rating, !fields.rating.value);
+      if(!fields.rating.value) ok = false;
+
+      const rev = fields.review.value.trim();
+      markError(fields.review, errs.review, rev.length < 40);
+      if(rev.length < 40) ok = false;
+
+      return ok;
+    }
+
+    function updateProgress(){
+      const checks = [
+        fields.property.value.trim().length > 0,
+        fields.landlord.value.trim().length > 0,
+        !!fields.when.value,
+        !!fields.rating.value,
+        fields.review.value.trim().length >= 40
+      ];
+      const done = checks.filter(Boolean).length;
+      const pct = Math.round((done / checks.length) * 100);
+      progressBar.style.width = pct + "%";
+    }
+
+    Object.values(fields).forEach(el => {
+      el.addEventListener("input", updateProgress);
+      el.addEventListener("change", updateProgress);
+    });
+
+    const DRAFT_KEY = "polycribs_review_draft_v1";
+
+    function saveDraft(){
+      const payload = {
+        property: fields.property.value,
+        address: fields.address.value,
+        landlord: fields.landlord.value,
+        rating: fields.rating.value,
+        review: fields.review.value,
+        when: fields.when.value,
+        verified: document.getElementById("verified").checked
+      };
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(payload));
+      showToast("Draft saved");
+    }
+
+    function loadDraft(){
+      try{
+        const raw = localStorage.getItem(DRAFT_KEY);
+        if(!raw) return;
+        const d = JSON.parse(raw);
+        fields.property.value = d.property || "";
+        fields.address.value = d.address || "";
+        fields.landlord.value = d.landlord || "";
+        fields.review.value = d.review || "";
+        fields.when.value = d.when || "";
+        document.getElementById("verified").checked = !!d.verified;
+        if(d.rating) setRating(Number(d.rating));
+        updateProgress();
+        showToast("Draft loaded");
+      }catch(e){}
+    }
+
+    document.getElementById("saveDraft").addEventListener("click", saveDraft);
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      updateProgress();
+      const ok = validate();
+      if(!ok){
+        showToast("Fix the highlighted fields");
+        return;
+      }
+      saveDraft();
+      showToast("Submitted (demo)");
+      form.reset();
+      fields.rating.value = "";
+      starBtns.forEach(btn => btn.setAttribute("aria-pressed", "false"));
+      ratingLabel.textContent = "No rating";
+      updateProgress();
+    });
+
+    loadDraft();
+    updateProgress();
+  </script>
+</body>
+</html>

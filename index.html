@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Rate My SLO Landlord - San Luis Obispo Rental Reviews</title>
-  <meta name="description" content="Find honest reviews of landlords and rental properties in San Luis Obispo. Read reviews from real tenants before signing your lease." />
+  <title>PolyCribs - San Luis Obispo Rental & Landlord Reviews</title>
+  <meta name="description" content="PolyCribs helps you find honest reviews of landlords and rental properties in San Luis Obispo. Read reviews from real tenants before signing your lease." />
 
   <link rel="stylesheet" href="styles.css">
 
@@ -16,17 +16,17 @@
   <!-- Top Nav -->
   <header class="topbar">
     <div class="container topbar__inner">
-      <a class="brand" href="/">
+      <a class="brand" href="index.html">
         <span class="brand__icon">🏠</span>
-        <span class="brand__name">Rate My SLO Landlord</span>
+        <span class="brand__name">PolyCribs</span>
       </a>
 
       <nav class="nav">
         <a class="nav__link" href="#search">Find Rentals</a>
         <span class="nav__sep">|</span>
-        <a class="nav__link" href="#reviews">Write a Review</a>
+        <a class="nav__link" href="write-review.html">Write a Review</a>
         <span class="nav__sep">|</span>
-        <a class="nav__link" href="#about">About</a>
+        <a class="nav__link" href="about.html">About</a>
         <button class="menu" aria-label="Open menu" title="Menu">
           <span></span><span></span><span></span>
         </button>
@@ -40,7 +40,7 @@
       <div class="hero__bg" role="img" aria-label="San Luis Obispo aerial view"></div>
 
       <div class="container hero__content">
-        <h1 class="hero__headline">Find Your Perfect<br>SLO Rental</h1>
+        <h1 class="hero__headline">Find Your Perfect SLO Rental</h1>
         <p class="hero__tagline">Honest reviews from real tenants in San Luis Obispo</p>
 
         <!-- Search bar -->
@@ -96,11 +96,11 @@
     <section class="stats">
       <div class="container stats__inner">
         <div class="stat">
-          <span class="stat__num">500+</span>
-          <span class="stat__label">Properties Reviewed</span>
+          <span class="stat__num">1,200+</span>
+          <span class="stat__label">Properties Listed</span>
         </div>
         <div class="stat">
-          <span class="stat__num">1,200+</span>
+          <span class="stat__num">850+</span>
           <span class="stat__label">Tenant Reviews</span>
         </div>
         <div class="stat">
@@ -234,7 +234,7 @@
         <div class="cta__text">
           <h2 class="cta__title">Share Your Experience</h2>
           <p class="cta__desc">Help fellow renters make informed decisions. Your honest review can save someone from a bad landlord or help them find a great one.</p>
-          <a href="#" class="btn">Write a Review</a>
+          <a href="write-review.html" class="btn">Write a Review</a>
         </div>
         <div class="cta__graphic">
           <div class="review-preview">
@@ -326,7 +326,7 @@
       <div class="container footer__inner">
         <div class="footer__brand">
           <span class="brand__icon">🏠</span>
-          <span>Rate My SLO Landlord</span>
+          <span>PolyCribs</span>
         </div>
         <div class="footer__links">
           <a href="#" class="footer__link">About Us</a>
@@ -335,7 +335,7 @@
           <a href="#" class="footer__link">Terms of Service</a>
         </div>
         <div class="footer__copy">
-          © <span id="year"></span> polycribs.com - All rights reserved.
+          © <span id="year"></span> PolyCribs - All rights reserved.
         </div>
       </div>
     </footer>
@@ -343,6 +343,21 @@
 
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
+
+    let lastScroll = 0;
+    const topbar = document.querySelector(".topbar");
+
+    window.addEventListener("scroll", () => {
+      const y = window.pageYOffset || document.documentElement.scrollTop;
+
+      if (y > lastScroll && y > 80) {
+        topbar.style.transform = "translateY(-100%)";
+      } else {
+        topbar.style.transform = "translateY(0)";
+      }
+
+      lastScroll = y;
+    }, { passive: true });
   </script>
 </body>
 </html>

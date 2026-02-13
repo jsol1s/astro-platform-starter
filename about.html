@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>About PolyCribs</title>
+  <meta name="description" content="Learn about PolyCribs: a renter-first place to share honest landlord and property reviews in San Luis Obispo." />
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="container topbar__inner">
+      <a class="brand" href="index.html">
+        <span class="brand__icon">🏠</span>
+        <span class="brand__name">PolyCribs</span>
+      </a>
+
+      <nav class="nav">
+        <a class="nav__link" href="index.html#search">Find Rentals</a>
+        <span class="nav__sep">|</span>
+        <a class="nav__link" href="write-review.html">Write a Review</a>
+        <span class="nav__sep">|</span>
+        <a class="nav__link" href="about.html" aria-current="page">About</a>
+        <button class="menu" aria-label="Open menu" title="Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-hero">
+      <div class="container page-hero__inner">
+        <h1 class="page-hero__title">About PolyCribs</h1>
+        <p class="page-hero__sub">
+          PolyCribs is a renter-first website for San Luis Obispo. We make it easier to find rentals and avoid bad situations by sharing honest,
+          experience-based reviews of landlords and properties.
+        </p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container page-grid">
+        <article class="panel">
+          <h2 class="panel__title">Our mission</h2>
+          <p class="panel__text">
+            Renting in SLO can be stressful: you’re making expensive decisions with limited information. PolyCribs exists to close that gap.
+            We’re building a community-driven place where tenants can share what it’s really like to live somewhere — the good, the bad, and the “wish I knew that before.”
+          </p>
+
+          <div style="height:14px"></div>
+
+          <h2 class="panel__title">How reviews work</h2>
+          <p class="panel__text">
+            Reviews are written by renters and focused on practical things: responsiveness, maintenance, deposit fairness, privacy/respect, noise, and overall experience.
+            The goal is clarity, not drama.
+          </p>
+
+          <div style="height:14px"></div>
+
+          <h2 class="panel__title">Fairness & transparency</h2>
+          <p class="panel__text">
+            We encourage specifics (dates, timelines, outcomes) and discourage personal attacks. If you’re writing a review, stick to what happened and what you’d want a friend to know.
+          </p>
+
+          <div class="cta-row" style="text-align:left; margin-top:18px">
+            <a class="btn" href="write-review.html">Write a Review</a>
+            <a class="btn btn--outline" href="index.html#search" style="margin-left:10px">Browse Rentals</a>
+          </div>
+        </article>
+
+        <aside class="panel">
+          <h2 class="panel__title">What we care about</h2>
+          <div class="kv">
+            <div class="kv__row"><span class="kv__k">Honesty</span><span class="kv__v">Real experiences</span></div>
+            <div class="kv__row"><span class="kv__k">Clarity</span><span class="kv__v">Useful details</span></div>
+            <div class="kv__row"><span class="kv__k">Safety</span><span class="kv__v">Renter-first</span></div>
+            <div class="kv__row"><span class="kv__k">Community</span><span class="kv__v">Help each other</span></div>
+          </div>
+
+          <div style="height:18px"></div>
+
+          <h2 class="panel__title">Questions?</h2>
+          <p class="panel__text">
+            Next easy add-ons: a Contact page, a simple “Report an issue” page, and a Property page template.
+          </p>
+        </aside>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="container footer__inner">
+        <div class="footer__brand">
+          <span class="brand__icon">🏠</span>
+          <span>PolyCribs</span>
+        </div>
+        <div class="footer__links">
+          <a href="about.html" class="footer__link">About Us</a>
+          <a href="#" class="footer__link">Contact</a>
+          <a href="#" class="footer__link">Privacy Policy</a>
+          <a href="#" class="footer__link">Terms of Service</a>
+        </div>
+        <div class="footer__copy">
+          © <span id="year"></span> polycribs.com - All rights reserved.
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    let lastScroll = 0;
+    const topbar = document.querySelector(".topbar");
+    window.addEventListener("scroll", () => {
+      const y = window.pageYOffset || document.documentElement.scrollTop;
+      if (y > lastScroll && y > 80) topbar.style.transform = "translateY(-100%)";
+      else topbar.style.transform = "translateY(0)";
+      lastScroll = y;
+    });
+  </script>
+</body>
+</html>
