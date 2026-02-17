@@ -22,7 +22,7 @@
       </a>
 
       <nav class="nav">
-        <a class="nav__link" href="#search">Find Rentals</a>
+        <a class="nav__link" href="properties.html">Find Rentals</a>
         <span class="nav__sep">|</span>
         <a class="nav__link" href="write-review.html">Write a Review</a>
         <span class="nav__sep">|</span>
@@ -44,7 +44,7 @@
         <p class="hero__tagline">Honest reviews from real tenants in San Luis Obispo</p>
 
         <!-- Search bar -->
-        <form class="search" action="#" method="get">
+        <form class="search" action="properties.html" method="get">
           <div class="search__pill">
             <input
               class="search__input"
@@ -121,23 +121,23 @@
             <div class="map__badge">SLO RENTALS</div>
 
             <!-- Neighborhood markers -->
-            <span class="dot" style="left: 18%; top: 32%" title="Cal Poly Area"></span>
-            <span class="dot" style="left: 28%; top: 45%" title="Downtown"></span>
-            <span class="dot" style="left: 42%; top: 38%" title="Laguna Lake"></span>
-            <span class="dot" style="left: 55%; top: 52%" title="Irish Hills"></span>
-            <span class="dot" style="left: 68%; top: 35%" title="Johnson Ave"></span>
-            <span class="dot" style="left: 78%; top: 48%" title="Broad Street"></span>
-            <span class="dot" style="left: 35%; top: 62%" title="SLO Airport Area"></span>
+            <span class="dot" data-hood="calpoly" style="left: 18%; top: 32%" title="Cal Poly Area"></span>
+            <span class="dot" data-hood="downtown" style="left: 28%; top: 45%" title="Downtown"></span>
+            <span class="dot" data-hood="laguna" style="left: 42%; top: 38%" title="Laguna Lake"></span>
+            <span class="dot" data-hood="irish" style="left: 55%; top: 52%" title="Irish Hills"></span>
+            <span class="dot" data-hood="johnson" style="left: 68%; top: 35%" title="Johnson Ave"></span>
+            <span class="dot" data-hood="broad" style="left: 78%; top: 48%" title="Broad Street"></span>
+            <span class="dot" data-hood="airport" style="left: 35%; top: 62%" title="SLO Airport Area"></span>
           </div>
         </div>
 
         <div class="neighborhoods">
-          <a href="#" class="neighborhood">Cal Poly Area</a>
-          <a href="#" class="neighborhood">Downtown</a>
-          <a href="#" class="neighborhood">Laguna Lake</a>
-          <a href="#" class="neighborhood">Irish Hills</a>
-          <a href="#" class="neighborhood">Johnson Ave</a>
-          <a href="#" class="neighborhood">Broad Street</a>
+          <a href="#" class="neighborhood" data-hood="calpoly">Cal Poly Area</a>
+          <a href="#" class="neighborhood" data-hood="downtown">Downtown</a>
+          <a href="#" class="neighborhood" data-hood="laguna">Laguna Lake</a>
+          <a href="#" class="neighborhood" data-hood="irish">Irish Hills</a>
+          <a href="#" class="neighborhood" data-hood="johnson">Johnson Ave</a>
+          <a href="#" class="neighborhood" data-hood="broad">Broad Street</a>
         </div>
       </div>
     </section>
@@ -147,10 +147,9 @@
       <div class="container">
         <h2 class="section__title">Top Rated Properties</h2>
         <p class="section__sub">Highest rated rentals in San Luis Obispo based on tenant reviews</p>
-
-        <div class="cards">
+<div class="cards">
           <!-- Card 1 -->
-          <article class="card">
+          <article class="card" data-hood="calpoly">
             <div class="card__meta">
               <div>
                 <h3 class="card__title">Mustang Village</h3>
@@ -168,7 +167,7 @@
           </article>
 
           <!-- Card 2 -->
-          <article class="card">
+          <article class="card" data-hood="downtown">
             <div class="card__meta">
               <div>
                 <h3 class="card__title">Downtown Lofts</h3>
@@ -186,7 +185,7 @@
           </article>
 
           <!-- Card 3 -->
-          <article class="card">
+          <article class="card" data-hood="laguna">
             <div class="card__meta">
               <div>
                 <h3 class="card__title">Laguna Lake Townhomes</h3>
@@ -204,7 +203,7 @@
           </article>
 
           <!-- Card 4 -->
-          <article class="card">
+          <article class="card" data-hood="broad">
             <div class="card__meta">
               <div>
                 <h3 class="card__title">Foothill Gardens</h3>
@@ -335,29 +334,25 @@
           <a href="#" class="footer__link">Terms of Service</a>
         </div>
         <div class="footer__copy">
-          © <span id="year"></span> PolyCribs - All rights reserved.
+          © <span id="year"></span> polycribs.com - All rights reserved.
         </div>
       </div>
     </footer>
   </main>
 
+  
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
 
+    // Hide topbar on scroll down, show on scroll up
     let lastScroll = 0;
     const topbar = document.querySelector(".topbar");
-
     window.addEventListener("scroll", () => {
       const y = window.pageYOffset || document.documentElement.scrollTop;
-
-      if (y > lastScroll && y > 80) {
-        topbar.style.transform = "translateY(-100%)";
-      } else {
-        topbar.style.transform = "translateY(0)";
-      }
-
+      if (y > lastScroll && y > 80) topbar.style.transform = "translateY(-100%)";
+      else topbar.style.transform = "translateY(0)";
       lastScroll = y;
-    }, { passive: true });
+    });
   </script>
 </body>
 </html>
