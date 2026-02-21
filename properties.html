@@ -91,6 +91,11 @@
 <div aria-live="polite" class="resultsbar">
 <span id="count"></span>
 </div>
+
+<div class="gmapwrap" aria-label="Map of results">
+  <div id="gmap" class="gmap" role="application" aria-label="Google map showing rental locations"></div>
+</div>
+
 <div class="plist" id="list" role="list"></div>
 </div>
 </section>
@@ -249,8 +254,87 @@ function fmtMoney(n) {
       els.count.textContent = list.length === 1 ? 'Showing 1 place' : `Showing ${list.length} places`;
     }
 
-    function refresh() {
-      render(filterProps());
+    
+    // --- Google Map (frontend-only) ---
+    // Uses POLYCRIBS.GEO (lat/lng) from data.js
+    let gmap = null;
+    let gmarkers = [];
+    let ginfo = null;
+    let pendingList = null;
+
+    function clearMarkers() {
+      gmarkers.forEach(m => m.setMap(null));
+      gmarkers = [];
+    }
+
+    function updateMap(list) {
+      if (!gmap) { pendingList = list; return; }
+
+      clearMarkers();
+
+      const bounds = new google.maps.LatLngBounds();
+      let any = false;
+
+      list.forEach(p => {
+        const geo = (window.POLYCRIBS && window.POLYCRIBS.GEO) ? window.POLYCRIBS.GEO[p.id] : null;
+        if (!geo || typeof geo.lat !== "number" || typeof geo.lng !== "number") return;
+
+        any = true;
+        const pos = { lat: geo.lat, lng: geo.lng };
+        bounds.extend(pos);
+
+        const marker = new google.maps.Marker({
+          position: pos,
+          map: gmap,
+          title: p.name,
+        });
+
+        marker.addListener("click", () => {
+          if (!ginfo) ginfo = new google.maps.InfoWindow();
+          const html = `
+            <div style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;">
+              <div style="font-weight:800; margin-bottom:4px;">${p.name}</div>
+              <div style="margin-bottom:6px;">${p.address}</div>
+              <div style="margin-bottom:8px;"><b>${fmtMoney(p.price)}/mo</b> · ${p.beds === 0 ? 'Studio' : p.beds + ' bd'} · ${p.baths} ba</div>
+              <a href="property.html?id=${p.id}">View details →</a>
+            </div>
+          `;
+          ginfo.setContent(html);
+          ginfo.open(gmap, marker);
+        });
+
+        gmarkers.push(marker);
+      });
+
+      if (any) {
+        gmap.fitBounds(bounds, 60);
+      } else {
+        gmap.setCenter({ lat: 35.2828, lng: -120.6596 });
+        gmap.setZoom(13);
+      }
+    }
+
+    // Called by Google Maps script callback
+    function initMap() {
+      gmap = new google.maps.Map(document.getElementById("gmap"), {
+        center: { lat: 35.2828, lng: -120.6596 }, // San Luis Obispo
+        zoom: 13,
+        mapTypeControl: false,
+        streetViewControl: false,
+        fullscreenControl: false,
+      });
+
+      // If filters already ran before Maps loaded, paint markers now
+      if (pendingList) updateMap(pendingList);
+    }
+
+
+function refresh() {
+      const list = filterProps();
+      render(list);
+      // keep the map in sync with the filtered list
+      if (window.google && window.google.maps) updateMap(list);
+      else pendingList = list;
     }
 
     ['input','change'].forEach(evt => {
@@ -280,5 +364,8 @@ function fmtMoney(n) {
 
     refresh();
   </script>
+
+  <!-- Google Maps (replace YOUR_API_KEY) -->
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAgv07mH0MrK1ch45I3MNLS87S6DEELllk&callback=initMap"></script>
 </body>
 </html>
