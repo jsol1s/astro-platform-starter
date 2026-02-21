@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PolyCribs - Property</title>
+  <meta name="description" content="Rental property details and tenant reviews in San Luis Obispo." />
+  <link rel="stylesheet" href="styles.css">
+
+  <link rel="icon" type="image/png" sizes="64x64" href="images/PolyCribsLogo.png">
+  <link rel="apple-touch-icon" href="images/PolyCribsLogo.png">
+</head>
+
+<body>
+  <div class="coming-soon">
+    🚧 PolyCribs is currently a prototype — features do not work yet.
+  </div>
+  <header class="topbar">
+    <div class="container topbar__inner">
+      <a class="brand" href="index.html">
+        <img class="brand__logo" src="images/polycribs_logo-png.png" alt="PolyCribs logo" />
+        <span class="brand__name">PolyCribs</span>
+      </a>
+
+      <nav class="nav">
+        <a class="nav__link" href="properties.html">Find Rentals</a>
+        <span class="nav__sep">|</span>
+        <a class="nav__link" href="write-review.html">Write a Review</a>
+        <span class="nav__sep">|</span>
+        <a class="nav__link" href="about.html">About</a>
+        <button class="menu" aria-label="Open menu" title="Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="section">
+      <div class="container">
+        <div class="phead">
+          <div>
+            <h1 class="phead__title" id="pName">Loading…</h1>
+            <p class="phead__meta" id="pMeta"></p>
+            <p class="phead__addr" id="pAddr"></p>
+          </div>
+
+          <div class="phead__side">
+            <div class="prating" id="pRating"></div>
+            <a class="btn btn--outline" id="writeReviewBtn" href="write-review.html">Write a Review</a>
+          </div>
+        </div>
+
+        <div class="pgrid">
+          <section class="pbox">
+            <h2 class="pbox__title">Overview</h2>
+            <p class="pbox__text" id="pDesc"></p>
+            <div class="pstats" id="pStats"></div>
+          </section>
+
+          <section class="pbox">
+            <h2 class="pbox__title">Rating breakdown</h2>
+            <div class="breakdown" id="breakdown"></div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--muted">
+      <div class="container">
+        <div class="prow__head">
+          <h2 class="section__title" style="margin:0">Reviews</h2>
+          <p class="section__sub" id="reviewCount" style="margin:8px 0 0"></p>
+        </div>
+        <div class="reviews" id="reviewsList"></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <h2 class="section__title">Nearby properties</h2>
+        <p class="section__sub">More rentals in the same area</p>
+        <div class="nearby" id="nearby"></div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="container footer__inner">
+        <div class="footer__brand">
+          <img src="images/polycribs_logo-png.png" alt="PolyCribs logo" style="height:65px;">
+          <span>PolyCribs</span>
+        </div>
+        <div class="footer__links">
+          <a href="about.html" class="footer__link">About Us</a>
+          <a href="#" class="footer__link">Contact</a>
+          <a href="#" class="footer__link">Privacy Policy</a>
+          <a href="#" class="footer__link">Terms of Service</a>
+        </div>
+        <div class="footer__copy">
+          © <span id="year"></span> polycribs.com — All rights reserved.
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <script src="data.js"></script>
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+
+    const PROPERTIES = (window.POLYCRIBS && window.POLYCRIBS.PROPERTIES) ? window.POLYCRIBS.PROPERTIES : [];
+    const REVIEWS = (window.POLYCRIBS && window.POLYCRIBS.REVIEWS) ? window.POLYCRIBS.REVIEWS : [];
+
+    const p = PROPERTIES.find(x => x.id === id);
+
+    const elName = document.getElementById("pName");
+    const elMeta = document.getElementById("pMeta");
+    const elAddr = document.getElementById("pAddr");
+    const elDesc = document.getElementById("pDesc");
+    const elStats = document.getElementById("pStats");
+    const elRating = document.getElementById("pRating");
+    const elBreakdown = document.getElementById("breakdown");
+    const elReviews = document.getElementById("reviewsList");
+    const elReviewCount = document.getElementById("reviewCount");
+    const elNearby = document.getElementById("nearby");
+    const elWrite = document.getElementById("writeReviewBtn");
+
+    function areaLabel(code){
+      const map = {
+        calpoly: "Cal Poly Area",
+        downtown: "Downtown",
+        laguna: "Laguna Lake",
+        irish: "Irish Hills",
+        johnson: "Johnson Ave",
+        broad: "Broad Street",
+        airport: "SLO Airport Area"
+      };
+      return map[code] || code || "";
+    }
+
+    function money(n){
+      return n ? ("$" + n.toLocaleString() + "/mo") : "";
+    }
+
+    function stars(n){
+      const full = Math.floor(n);
+      const half = (n - full) >= 0.5;
+      return "★".repeat(full) + (half ? "½" : "") + "☆".repeat(Math.max(0, 5 - full - (half ? 1 : 0)));
+    }
+
+    function renderBreakdown(list){
+      const counts = [0,0,0,0,0]; // 1..5
+      list.forEach(r => { if (r.rating>=1 && r.rating<=5) counts[r.rating-1]++; });
+      const total = counts.reduce((a,b)=>a+b,0) || 1;
+
+      elBreakdown.innerHTML = "";
+      for (let i=5;i>=1;i--){
+        const c = counts[i-1];
+        const pct = Math.round((c/total)*100);
+        const row = document.createElement("div");
+        row.className = "breakdown__row";
+        row.innerHTML = `
+          <div class="breakdown__label">${i}★</div>
+          <div class="breakdown__bar"><span style="width:${pct}%"></span></div>
+          <div class="breakdown__pct">${pct}%</div>
+        `;
+        elBreakdown.appendChild(row);
+      }
+    }
+
+    function renderReviews(list){
+      elReviews.innerHTML = "";
+      list.slice(0, 25).forEach(r => {
+        const art = document.createElement("article");
+        art.className = "review";
+        art.innerHTML = `
+          <div class="review__header">
+            <span class="review__property">${p.name}</span>
+            <span class="review__rating">${"★".repeat(r.rating)}${"☆".repeat(5-r.rating)} ${r.rating.toFixed(1)}</span>
+          </div>
+          <p class="review__text">"${r.text}"</p>
+          <div class="review__footer">
+            <span class="review__date">${r.date}</span>
+            <span class="review__verified">${r.verified ? "Verified Tenant" : r.author}</span>
+          </div>
+        `;
+        elReviews.appendChild(art);
+      });
+    }
+
+    function renderNearby(){
+      const sameArea = PROPERTIES.filter(x => x.area === p.area && x.id !== p.id).slice(0, 6);
+      elNearby.innerHTML = "";
+      if (!sameArea.length){
+        elNearby.innerHTML = "<p style=\"color:var(--muted); font-weight:650;\">No nearby properties yet.</p>";
+        return;
+      }
+      sameArea.forEach(x => {
+        const a = document.createElement("a");
+        a.className = "nearby__item";
+        a.href = `property.html?id=${x.id}`;
+        a.innerHTML = `
+          <div class="nearby__name">${x.name}</div>
+          <div class="nearby__meta">${areaLabel(x.area)} • ${money(x.price)} • ${x.beds} bd / ${x.baths} ba</div>
+          <div class="nearby__rating">${x.rating.toFixed(1)} ★ • ${x.reviews} reviews</div>
+        `;
+        elNearby.appendChild(a);
+      });
+    }
+
+    if (!p){
+      document.title = "PolyCribs - Property not found";
+      elName.textContent = "Property not found";
+      elMeta.textContent = "That listing doesn't exist (yet).";
+      elAddr.textContent = "";
+      elDesc.textContent = "Try going back to Browse Rentals and selecting a property from the list.";
+      elWrite.href = "properties.html";
+      elWrite.textContent = "Back to Browse Rentals";
+      elRating.textContent = "";
+      elStats.innerHTML = "";
+      elReviewCount.textContent = "";
+      elBreakdown.innerHTML = "";
+      elReviews.innerHTML = "";
+      elNearby.innerHTML = "";
+    } else {
+      document.title = `PolyCribs - ${p.name}`;
+      elName.textContent = p.name;
+      elMeta.textContent = `${areaLabel(p.area)} • ${money(p.price)} • ${p.beds} bd / ${p.baths} ba`;
+      elAddr.textContent = p.address ? p.address : "";
+      elDesc.textContent = "A community-reviewed rental listing on PolyCribs. Ratings and reviews are from tenants in San Luis Obispo.";
+      elStats.innerHTML = `
+        <div class="pstat"><span class="pstat__k">Price</span><span class="pstat__v">${money(p.price)}</span></div>
+        <div class="pstat"><span class="pstat__k">Beds</span><span class="pstat__v">${p.beds}</span></div>
+        <div class="pstat"><span class="pstat__k">Baths</span><span class="pstat__v">${p.baths}</span></div>
+        <div class="pstat"><span class="pstat__k">Area</span><span class="pstat__v">${areaLabel(p.area)}</span></div>
+      `;
+      elRating.innerHTML = `
+        <div class="prating__num">${p.rating.toFixed(1)}</div>
+        <div class="prating__stars">${stars(p.rating)}</div>
+        <div class="prating__sub">${p.reviews} reviews</div>
+      `;
+      const list = REVIEWS.filter(r => r.property_id === p.id);
+      elReviewCount.textContent = `${list.length} reviews`;
+      renderBreakdown(list);
+      renderReviews(list);
+
+      // Deep-link to write-review with prefill
+      const u = new URL("write-review.html", window.location.href);
+      u.searchParams.set("property", p.name);
+      if (p.address) u.searchParams.set("address", p.address);
+      elWrite.href = u.toString();
+
+      renderNearby();
+    }
+  </script>
+</body>
+</html>
