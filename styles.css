@@ -11,6 +11,7 @@
   --radius: 18px;
   --gold: #f4b942;
   --red: #c44536;
+  ---banner-h: 40px;
 }
 
 *{ box-sizing:border-box; }
@@ -18,6 +19,9 @@ html{ scroll-behavior: smooth; }
 html,body{ margin:0; padding:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color:var(--text); background:var(--bg); }
 img{ max-width:100%; display:block; }
 a{ color:inherit; }
+body{
+  padding-top: calc(var(--banner-h) + 0px)
+}
 
 .section-title {
   display: inline-block;
@@ -43,16 +47,34 @@ a{ color:inherit; }
 
 /* Coming Soon Banner */
 .coming-soon{
-  background: #000;
-  color: #fff;
-  text-align: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--banner-h);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  background: #ffcc00;
+  color: #000;
   font-weight: 700;
-  font-size: 14px;
-  padding: 10px 16px;
-  letter-spacing: .3px;
+  z-index: 1000;
 }
 
 /* Top bar */
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.brand__logo{
+  height:75px;      /* tweak to taste */
+  width:auto;
+  display:block;
+}
+
 .topbar {
   background: #000;
   border-bottom: 1px solid rgba(255,255,255,.1);
@@ -61,8 +83,8 @@ a{ color:inherit; }
   display: flex;
   align-items: center;
   position: sticky;
-  top: 0;
-  z-index: 100;
+  top: 20px;
+  z-index: 900;
   transition: transform 0.3s ease-in-out;
 }
 
@@ -134,7 +156,7 @@ a{ color:inherit; }
   inset:0;
   background:
     linear-gradient(180deg, rgba(31,93,44,.75), rgba(0,0,0,.55)),
-    url("https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=2000&q=60");
+    url("public/images/PacStockimg.jpg");
   background-size:cover;
   background-position:center;
   transform:scale(1.02);

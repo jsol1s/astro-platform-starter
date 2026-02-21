@@ -9,7 +9,8 @@
   <link rel="stylesheet" href="styles.css">
 
   <!-- Favicon -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
+  <link rel="icon" type="image/png" sizes="1000x1000" href="public/images/polycribs_logo-png.png">
+  <link rel="apple-touch-icon" href="public/images/polycribs_logo-png.png">
 </head>
 
 <body>
@@ -18,9 +19,9 @@
   </div>
   <!-- Top Nav -->
   <header class="topbar">
-    <div class="contaigit ner topbar__inner">
+    <div class="container ner topbar__inner">
       <a class="brand" href="index.html">
-        <span class="brand__icon">🏠</span>
+        <img class="brand__logo" src="public/images/polycribs_logo-png.png" alt="PolyCribs logo" />
         <span class="brand__name">PolyCribs</span>
       </a>
 
@@ -119,19 +120,8 @@
         <h2 class="section__title">Explore SLO Rentals</h2>
         <p class="section__sub">Browse rental listings across San Luis Obispo neighborhoods</p>
 
-        <div class="mapwrap">
-          <div class="map" role="img" aria-label="Map of San Luis Obispo rentals">
-            <div class="map__badge">SLO RENTALS</div>
-
-            <!-- Neighborhood markers -->
-            <span class="dot" data-hood="calpoly" style="left: 18%; top: 32%" title="Cal Poly Area"></span>
-            <span class="dot" data-hood="downtown" style="left: 28%; top: 45%" title="Downtown"></span>
-            <span class="dot" data-hood="laguna" style="left: 42%; top: 38%" title="Laguna Lake"></span>
-            <span class="dot" data-hood="irish" style="left: 55%; top: 52%" title="Irish Hills"></span>
-            <span class="dot" data-hood="johnson" style="left: 68%; top: 35%" title="Johnson Ave"></span>
-            <span class="dot" data-hood="broad" style="left: 78%; top: 48%" title="Broad Street"></span>
-            <span class="dot" data-hood="airport" style="left: 35%; top: 62%" title="SLO Airport Area"></span>
-          </div>
+        <div class="gmapwrap" aria-label="Map of SLO rentals">
+          <div id="homeGmap" class="gmap" role="application" aria-label="Google map showing San Luis Obispo rentals"></div>
         </div>
 
         <div class="neighborhoods">
@@ -327,7 +317,7 @@
     <footer class="footer">
       <div class="container footer__inner">
         <div class="footer__brand">
-          <span class="brand__icon">🏠</span>
+          <img src="public/images/polycribs_logo-png.png" alt="PolyCribs logo" style="height:65px;">
           <span>PolyCribs</span>
         </div>
         <div class="footer__links">
@@ -357,5 +347,37 @@
       lastScroll = y;
     });
   </script>
+
+  <script>
+  // Called by Google Maps script callback
+  function initHomeMap() {
+    const map = new google.maps.Map(document.getElementById("homeGmap"), {
+      center: { lat: 35.2828, lng: -120.6596 }, // SLO
+      zoom: 13,
+      mapTypeControl: false,
+      streetViewControl: false,
+      fullscreenControl: false,
+    });
+
+    // Optional: a few “neighborhood-ish” pins (feel free to tweak)
+    const spots = [
+      { name: "Downtown",    pos: { lat: 35.2828, lng: -120.6596 } },
+      { name: "Cal Poly",    pos: { lat: 35.3006, lng: -120.6625 } },
+      { name: "Laguna Lake", pos: { lat: 35.2680, lng: -120.6810 } },
+    ];
+
+    spots.forEach(s => {
+      const m = new google.maps.Marker({ map, position: s.pos, title: s.name });
+      m.addListener("click", () => {
+        const iw = new google.maps.InfoWindow({ content: `<b>${s.name}</b>` });
+        iw.open(map, m);
+      });
+    });
+  }
+</script>
+<script async defer
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAgv07mH0MrK1ch45I3MNLS87S6DEELllk&callback=initHomeMap">
+</script>
+
 </body>
 </html>
