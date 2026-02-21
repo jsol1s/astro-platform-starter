@@ -1,27 +1,21 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Markdown from "../components/Markdown.astro";
+import postgres from "postgres";
 
 const explainer = `...`;
 
-const API_BASE = import.meta.env.NEON_API_URL;
-const NEON_KEY = import.meta.env.NEON_API_KEY;
+// Use Netlify-provided Neon connection string
+const connectionString =
+  import.meta.env.NETLIFY_DATABASE_URL ||
+  import.meta.env.NETLIFY_DATABASE_URL_UNPOOLED ||
+  process.env.NETLIFY_DATABASE_URL ||
+  process.env.NETLIFY_DATABASE_URL_UNPOOLED;
 
-if (!API_BASE) throw new Error("Missing env var: NEON_API_URL");
-if (!NEON_KEY) throw new Error("Missing env var: NEON_API_KEY");
+if (!connectionString) throw new Error("Missing NETLIFY_DATABASE_URL");
 
-const res = await fetch(`${API_BASE}/listings`, {
-  headers: {
-    apikey: NEON_KEY,
-    Authorization: `Bearer ${NEON_KEY}`,
-    "Content-Type": "application/json",
-  },
-});
+const sql = postgres(connectionString, { ssl: "require" });
 
-if (!res.ok) {
-  const text = await res.text();
-  throw new Error(`Failed to fetch listings: ${res.status} ${res.statusText}\n${text}`);
-}
-
-const listings = await res.json();
+// adjust columns to match your schema
+const listings = await sql`SELECT * FROM listings ORDER BY id DESC`;
 ---
