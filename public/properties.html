@@ -111,12 +111,6 @@
 <img src="images/polycribs_logo-png.png" alt="PolyCribs logo" style="height:65px;">
 <span>PolyCribs</span>
 </div>
-<div class="footer__links">
-<a class="footer__link" href="#">About Us</a>
-<a class="footer__link" href="#">Contact</a>
-<a class="footer__link" href="#">Privacy Policy</a>
-<a class="footer__link" href="#">Terms of Service</a>
-</div>
 <div class="footer__copy">
           © <span id="year"></span> polycribs.com - All rights reserved.
         </div>
@@ -371,7 +365,20 @@ function refresh() {
     refresh();
   </script>
 
-  <!-- Google Maps (replace YOUR_API_KEY) -->
+  <script>
+  // Hide topbar on scroll down, show on scroll up
+  let lastScroll = 0;
+  const topbar = document.querySelector(".topbar");
+
+  window.addEventListener("scroll", () => {
+    const y = window.pageYOffset || document.documentElement.scrollTop;
+    if (y > lastScroll && y > 80) topbar.classList.add("is-hidden");
+    else topbar.classList.remove("is-hidden");
+    lastScroll = y;
+  });
+</script>
+
+  <!-- Google Maps thingy-->
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAgv07mH0MrK1ch45I3MNLS87S6DEELllk&callback=initMap"></script>
 </body>
 </html>
