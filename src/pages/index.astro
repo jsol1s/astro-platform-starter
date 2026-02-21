@@ -1,19 +1,27 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Markdown from '../components/Markdown.astro';
+import Layout from "../layouts/Layout.astro";
+import Markdown from "../components/Markdown.astro";
 
-const explainer = `
-An Astro website can go way beyond static pages - on the right platform.
+const explainer = `...`;
 
-Netlify supports not only [Streaming SSR](https://docs.astro.build/en/guides/server-side-rendering/#html-streaming) and fast [Edge Middleware](https://docs.astro.build/en/guides/middleware/), but also [on-demand revalidation](https://www.netlify.com/blog/cache-tags-and-purge-api-on-netlify/) and [stale-while-revalidate](https://www.netlify.com/blog/swr-and-fine-grained-cache-control/). 
-Any page or data can be rebuilt only when needed, without site visitors ever getting a performance hit.
-`;
+const API_BASE = import.meta.env.NEON_API_URL;
+const NEON_KEY = import.meta.env.NEON_API_KEY;
+
+if (!API_BASE) throw new Error("Missing env var: NEON_API_URL");
+if (!NEON_KEY) throw new Error("Missing env var: NEON_API_KEY");
+
+const res = await fetch(`${API_BASE}/listings`, {
+  headers: {
+    apikey: NEON_KEY,
+    Authorization: `Bearer ${NEON_KEY}`,
+    "Content-Type": "application/json",
+  },
+});
+
+if (!res.ok) {
+  const text = await res.text();
+  throw new Error(`Failed to fetch listings: ${res.status} ${res.statusText}\n${text}`);
+}
+
+const listings = await res.json();
 ---
-
-<Layout title="Welcome to Astro.">
-    <h1 class="mb-10">Netlify Platform Starter for Astro</h1>
-    <Markdown content={explainer} class="mb-10 text-lg" />
-    <p>
-        <a href="https://docs.netlify.com/frameworks/astro/" class="btn btn-lg sm:min-w-64">Read the Docs</a>
-    </p>
-</Layout>
