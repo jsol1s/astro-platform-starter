@@ -1,21 +1,34 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Markdown from "../components/Markdown.astro";
+
+// Import postgres for server-side DB queries
 import postgres from "postgres";
 
-const explainer = `...`;
+// Get connection string from environment variable
+const connectionString = import.meta.env.DATABASE_URL;
 
-// Use Netlify-provided Neon connection string
-const connectionString =
-  import.meta.env.NETLIFY_DATABASE_URL ||
-  import.meta.env.NETLIFY_DATABASE_URL_UNPOOLED ||
-  process.env.NETLIFY_DATABASE_URL ||
-  process.env.NETLIFY_DATABASE_URL_UNPOOLED;
+if (!connectionString) throw new Error("Missing DATABASE_URL");
 
-if (!connectionString) throw new Error("Missing NETLIFY_DATABASE_URL");
-
+// Connect to Neon
 const sql = postgres(connectionString, { ssl: "require" });
 
-// adjust columns to match your schema
+// Example query — adjust to your table/schema
 const listings = await sql`SELECT * FROM listings ORDER BY id DESC`;
+
+// Just for practice, create a simple message
+const explainer = "This page fetches listings from Neon and displays them below.";
 ---
+
+<Layout>
+  <h1>Home Page</h1>
+  <p>{explainer}</p>
+
+  <h2>Listings:</h2>
+  <ul>
+    {listings.map(listing => (
+      <li>
+        {listing.name} - ${listing.price}
+      </li>
+    ))}
+  </ul>
+</Layout>
