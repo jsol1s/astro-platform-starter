@@ -1,82 +1,94 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import { neon } from "@netlify/neon";
 
 const title = "PolyCribs - Rentals & Reviews in San Luis Obispo";
-const description = "Browse reviewed rentals in San Luis Obispo. Filter by price, area, beds, and baths.";
+const description =
+  "Browse reviewed rentals in San Luis Obispo. Filter by price, area, beds, and baths.";
+
+const sql = neon();
+
+let properties = [];
+
+try {
+  properties = await sql`
+    SELECT
+      id::text        AS id,
+      title           AS name,
+      LOWER(location) AS area,
+      price::numeric  AS price,
+      0               AS beds,
+      0               AS baths,
+      0               AS rating,
+      0               AS reviews,
+      description     AS address
+    FROM listings
+    ORDER BY id;
+  `;
+} catch (err) {
+  // don't throw — log and fall back to empty list so build doesn't fail
+  console.error("DB query failed:", err);
+  properties = [];
+}
 ---
+
 <Layout title={title} description={description} active="properties">
+
 <section class="section">
-<div class="container">
-<h1 class="section__title">Browse Rentals</h1>
-<p class="section__sub">Explore places</p>
-<div aria-label="Property filters" class="filters" role="region">
-<input aria-label="Search by name or address" class="filters__input" id="q" placeholder="Search name or address…" type="text"/>
-<label class="filters__label">
-<span class="sr-only">Area</span>
-<select aria-label="Filter by area" class="filters__select" id="area">
-<option value="">All areas</option>
-<option value="calpoly">Cal Poly Area</option><option value="downtown">Downtown</option><option value="laguna">Laguna Lake</option><option value="irish">Irish Hills</option><option value="johnson">Johnson Ave</option><option value="broad">Broad Street</option><option value="airport">SLO Airport Area</option>
-</select>
-<span aria-hidden="true" class="chev">▾</span>
-</label>
-<label class="filters__label">
-<span class="sr-only">Price</span>
-<select aria-label="Filter by price" class="filters__select" id="price">
-<option value="">Any price</option>
-<option value="0-1500">Under $1,500</option>
-<option value="1500-2000">$1,500 - $2,000</option>
-<option value="2000-2500">$2,000 - $2,500</option>
-<option value="2500-3000">$2,500 - $3,000</option>
-<option value="3000+">$3,000+</option>
-</select>
-<span aria-hidden="true" class="chev">▾</span>
-</label>
-<label class="filters__label">
-<span class="sr-only">Beds</span>
-<select aria-label="Filter by beds" class="filters__select" id="beds">
-<option value="">Any beds</option>
-<option value="0">Studio+</option>
-<option value="1">1+ bed</option>
-<option value="2">2+ beds</option>
-<option value="3">3+ beds</option>
-<option value="4">4+ beds</option>
-</select>
-<span aria-hidden="true" class="chev">▾</span>
-</label>
-<label class="filters__label">
-<span class="sr-only">Baths</span>
-<select aria-label="Filter by baths" class="filters__select" id="baths">
-<option value="">Any baths</option>
-<option value="1">1+ bath</option>
-<option value="2">2+ baths</option>
-<option value="3">3+ baths</option>
-</select>
-<span aria-hidden="true" class="chev">▾</span>
-</label>
-<label class="filters__label">
-<span class="sr-only">Sort</span>
-<select aria-label="Sort results" class="filters__select" id="sort">
-<option value="rating_desc">Sort: Rating (high → low)</option>
-<option value="price_asc">Sort: Price (low → high)</option>
-<option value="price_desc">Sort: Price (high → low)</option>
-<option value="reviews_desc">Sort: Most reviewed</option>
-</select>
-<span aria-hidden="true" class="chev">▾</span>
-</label>
-<button class="filters__clear" id="clear" type="button">Clear</button>
-</div>
-<div aria-live="polite" class="resultsbar">
-<span id="count"></span>
-</div>
-<div aria-label="Map of results" class="gmapwrap">
-<div aria-label="Google map showing rental locations" class="gmap" id="gmap" role="application"></div>
-</div>
-<div class="plist" id="list" role="list"></div>
-</div>
+  <div class="container">
+
+    <h1 class="section__title">Browse Rentals</h1>
+    <p class="section__sub">Explore places</p>
+
+    <div aria-label="Property filters" class="filters" role="region">
+      <input aria-label="Search by name or address" class="filters__input" id="q" placeholder="Search name or address…" type="text"/>
+
+      <label class="filters__label">
+        <select aria-label="Filter by area" class="filters__select" id="area">
+          <option value="">All areas</option>
+          <option value="calpoly">Cal Poly Area</option>
+          <option value="downtown">Downtown</option>
+          <option value="laguna">Laguna Lake</option>
+          <option value="irish">Irish Hills</option>
+          <option value="johnson">Johnson Ave</option>
+          <option value="broad">Broad Street</option>
+          <option value="airport">SLO Airport Area</option>
+        </select>
+        <span aria-hidden="true" class="chev">▾</span>
+      </label>
+
+      <label class="filters__label">
+        <select aria-label="Filter by price" class="filters__select" id="price">
+          <option value="">Any price</option>
+          <option value="0-1500">Under $1,500</option>
+          <option value="1500-2000">$1,500 - $2,000</option>
+          <option value="2000-2500">$2,000 - $2,500</option>
+          <option value="2500-3000">$2,500 - $3,000</option>
+          <option value="3000+">$3,000+</option>
+        </select>
+        <span aria-hidden="true" class="chev">▾</span>
+      </label>
+
+      <button class="filters__clear" id="clear" type="button">Clear</button>
+    </div>
+
+    <div aria-live="polite" class="resultsbar">
+      <span id="count"></span>
+    </div>
+
+    <div class="plist" id="list" role="list"></div>
+
+  </div>
 </section>
 
-<script is:inline src="/data.js"></script>
+<!-- Inject DB data into the browser BEFORE the client script -->
+<script is:inline define:vars={{ properties }}>
+  window.POLYCRIBS = window.POLYCRIBS || {};
+  window.POLYCRIBS.PROPERTIES = properties;
+</script>
+
 <script>
+<<<<<<< HEAD
     const PROPERTIES = (window.POLYCRIBS && window.POLYCRIBS.PROPERTIES) ? window.POLYCRIBS.PROPERTIES : [];
     const ONLY_ADDRESS_SUBSTR = "chorro"; // matches "Chorro" anywhere in name/address
 const els = {
@@ -89,48 +101,64 @@ const els = {
       clear: document.getElementById('clear'),
       list: document.getElementById('list'),
       count: document.getElementById('count'),
+=======
+  // Read injected data (safe fallback to empty array)
+  var PROPERTIES = (window.POLYCRIBS && window.POLYCRIBS.PROPERTIES) ? window.POLYCRIBS.PROPERTIES : [];
+
+  var els = {
+    q: document.getElementById('q'),
+    area: document.getElementById('area'),
+    price: document.getElementById('price'),
+    clear: document.getElementById('clear'),
+    list: document.getElementById('list'),
+    count: document.getElementById('count'),
+  };
+
+  function fmtMoney(n) {
+    if (n === null || n === undefined) return "";
+    return "$" + Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 });
+  }
+
+  function areaLabel(key) {
+    var map = {
+      calpoly: 'Cal Poly Area',
+      downtown: 'Downtown',
+      laguna: 'Laguna Lake',
+      irish: 'Irish Hills',
+      johnson: 'Johnson Ave',
+      broad: 'Broad Street',
+      airport: 'SLO Airport Area'
+>>>>>>> ef6228e2d39e770a80fe04de382a5029970bac93
     };
+    return map[key] || key || "";
+  }
 
-    
-    // Prefill filters from URL params (from homepage search pill)
-    const params = new URLSearchParams(window.location.search);
-    const qp = params.get("q") || "";
-    const pp = params.get("price") || "";
-    const bb = params.get("beds_baths") || "";
-    const ap = params.get("area") || "";
+  function matchText(p, q) {
+    if (!q) return true;
+    var t = q.trim().toLowerCase();
+    var hay = ((p.name || "") + " " + (p.address || "")).toLowerCase();
+    return hay.indexOf(t) !== -1;
+  }
 
-    if (qp) els.q.value = qp;
-    if (pp) els.price.value = pp;
-
-    if (ap) els.area.value = ap;
-
-    if (bb) {
-      if (bb === "studio") { els.beds.value = "0"; els.baths.value = ""; }
-      else {
-        const parts = bb.split("_");
-        if (parts.length === 2) {
-          els.beds.value = parts[0];
-          els.baths.value = parts[1];
-        }
-      }
+  function inPriceRange(price, range) {
+    if (!range) return true;
+    if (range.indexOf('+') !== -1) {
+      var min = parseInt(range.replace('+',''), 10) || 0;
+      return price >= min;
     }
-function fmtMoney(n) {
-      return n.toLocaleString('en-US', { style:'currency', currency:'USD', maximumFractionDigits:0 });
-    }
+    var parts = range.split('-');
+    if (parts.length !== 2) return true;
+    var lo = parseInt(parts[0], 10) || 0;
+    var hi = parseInt(parts[1], 10) || 0;
+    return price >= lo && price <= hi;
+  }
 
-    function areaLabel(key) {
-      const map = {
-        calpoly: 'Cal Poly Area',
-        downtown: 'Downtown',
-        laguna: 'Laguna Lake',
-        irish: 'Irish Hills',
-        johnson: 'Johnson Ave',
-        broad: 'Broad Street',
-        airport: 'SLO Airport Area',
-      };
-      return map[key] || key;
-    }
+  function filterProps() {
+    var q = els.q.value;
+    var area = els.area.value;
+    var price = els.price.value;
 
+<<<<<<< HEAD
     function inPriceRange(price, range) {
       if (!range) return true;
       if (range.endsWith('+')) {
@@ -308,23 +336,77 @@ function refresh() {
       els.beds.addEventListener(evt, refresh);
       els.baths.addEventListener(evt, refresh);
       els.sort.addEventListener(evt, refresh);
+=======
+    return PROPERTIES.filter(function(p) {
+      if (!matchText(p, q)) return false;
+      if (area && p.area !== area) return false;
+      if (!inPriceRange(p.price, price)) return false;
+      return true;
+>>>>>>> ef6228e2d39e770a80fe04de382a5029970bac93
     });
+  }
 
-    els.clear.addEventListener('click', () => {
-      els.q.value = '';
-      els.area.value = '';
-      els.price.value = '';
-      els.beds.value = '';
-      els.baths.value = '';
-      els.sort.value = 'rating_desc';
-      refresh();
-    });
+  function render(list) {
+    els.list.innerHTML = '';
 
-    // Footer year (if present)
-    const yearEl = document.getElementById('year');
-    if (yearEl) yearEl.textContent = new Date().getFullYear();
+    for (var i = 0; i < list.length; i++) {
+      var p = list[i];
 
+      var article = document.createElement('article');
+      article.className = 'pitem';
+      article.setAttribute('role','listitem');
+
+      var href = '/property?id=' + encodeURIComponent(p.id || '');
+      var addr = p.address || '';
+      var price = fmtMoney(p.price);
+
+      var inner = '<a class="pitem__main pitem__link" href="' + href + '">' +
+                  '<div class="pitem__top">' +
+                    '<h3 class="pitem__title">' + (p.name || '') + '</h3>' +
+                    '<span class="pitem__price">' + price + '/mo</span>' +
+                  '</div>' +
+                  '<div class="pitem__meta">' +
+                    '<span class="pill">' + areaLabel(p.area) + '</span>' +
+                    '<span class="pitem__addr">' + addr + '</span>' +
+                  '</div>' +
+                  '</a>' +
+                  '<div class="pitem__side">' +
+                    '<div class="pitem__rating" aria-label="Rating ' + (p.rating || 0) + ' out of 5">' +
+                      '<span class="pitem__ratingnum">' + (Number(p.rating || 0).toFixed(1)) + '</span>' +
+                      '<span class="pitem__stars">' + (new Array(Math.floor(p.rating || 0) + 1).join('★')) + '</span>' +
+                    '</div>' +
+                    '<a class="btn btn--outline pitem__btn" href="/write-review?property=' + encodeURIComponent(p.name || '') + '&address=' + encodeURIComponent(addr) + '">Write a review</a>' +
+                  '</div>';
+
+      article.innerHTML = inner;
+      els.list.appendChild(article);
+    }
+
+    if (list.length === 1) {
+      els.count.textContent = "Showing 1 place";
+    } else {
+      els.count.textContent = "Showing " + list.length + " places";
+    }
+  }
+
+  function refresh() {
+    var out = filterProps();
+    render(out);
+  }
+
+  // wire events
+  if (els.q) els.q.addEventListener('input', refresh);
+  if (els.area) els.area.addEventListener('change', refresh);
+  if (els.price) els.price.addEventListener('change', refresh);
+  if (els.clear) els.clear.addEventListener('click', function() {
+    els.q.value = '';
+    els.area.value = '';
+    els.price.value = '';
     refresh();
-  </script>
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAgv07mH0MrK1ch45I3MNLS87S6DEELllk&callback=initMap"></script>
+  });
+
+  // initial render
+  refresh();
+</script>
+
 </Layout>
