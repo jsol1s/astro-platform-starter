@@ -78,6 +78,7 @@ const description = "Browse reviewed rentals in San Luis Obispo. Filter by price
 <script is:inline src="/data.js"></script>
 <script>
     const PROPERTIES = (window.POLYCRIBS && window.POLYCRIBS.PROPERTIES) ? window.POLYCRIBS.PROPERTIES : [];
+    const ONLY_ADDRESS_SUBSTR = "chorro"; // matches "Chorro" anywhere in name/address
 const els = {
       q: document.getElementById('q'),
       area: document.getElementById('area'),
@@ -153,7 +154,9 @@ function fmtMoney(n) {
       const beds = els.beds.value === '' ? null : parseInt(els.beds.value, 10);
       const baths = els.baths.value === '' ? null : parseInt(els.baths.value, 10);
 
-      let out = PROPERTIES.filter(p => {
+      let out = PROPERTIES
+  .filter(p => (p.address || "").toLowerCase().includes(ONLY_ADDRESS_SUBSTR))
+  .filter(p =>  {
         if (!matchText(p, q)) return false;
         if (area && p.area !== area) return false;
         if (!inPriceRange(p.price, price)) return false;
