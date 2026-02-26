@@ -1,27 +1,199 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Markdown from "../components/Markdown.astro";
 
-const explainer = `...`;
-
-const API_BASE = import.meta.env.NEON_API_URL;
-const NEON_KEY = import.meta.env.NEON_API_KEY;
-
-if (!API_BASE) throw new Error("Missing env var: NEON_API_URL");
-if (!NEON_KEY) throw new Error("Missing env var: NEON_API_KEY");
-
-const res = await fetch(`${API_BASE}/listings`, {
-  headers: {
-    apikey: NEON_KEY,
-    Authorization: `Bearer ${NEON_KEY}`,
-    "Content-Type": "application/json",
-  },
-});
-
-if (!res.ok) {
-  const text = await res.text();
-  throw new Error(`Failed to fetch listings: ${res.status} ${res.statusText}\n${text}`);
-}
-
-const listings = await res.json();
+const title = "PolyCribs - San Luis Obispo Rental & Landlord Reviews";
+const description = "PolyCribs helps you find honest reviews of landlords and rental properties in San Luis Obispo. Read reviews from real tenants before signing your lease.";
 ---
+<Layout title={title} description={description} active="">
+<section class="hero" id="search">
+<div aria-label="San Luis Obispo aerial view" class="hero__bg" role="img"></div>
+<div class="container hero__content">
+<h1 class="hero__headline">Find Your Off-Campus Solution</h1>
+<!-- Search bar -->
+<form action="/properties" class="search" method="get">
+<div class="search__pill">
+<input aria-label="Search properties" class="search__input" name="q" placeholder="Search by address, landlord, or property name..." type="text"/>
+<div aria-hidden="true" class="search__divider"></div>
+<label class="search__label">
+<span class="sr-only">Price</span>
+<select class="search__select" name="price">
+<option value="">Price Range</option>
+<option value="0-1500">Under $1,500</option>
+<option value="1500-2000">$1,500 - $2,000</option>
+<option value="2000-2500">$2,000 - $2,500</option>
+<option value="2500-3000">$2,500 - $3,000</option>
+<option value="3000+">$3,000+</option>
+</select>
+<span aria-hidden="true" class="chev">▾</span>
+</label>
+<div aria-hidden="true" class="search__divider"></div>
+<label class="search__label">
+<span class="sr-only">Beds and baths</span>
+<select class="search__select" name="beds_baths">
+<option value="">Beds + Baths</option>
+<option value="studio">Studio</option>
+<option value="1_1">1 bed / 1 bath</option>
+<option value="2_1">2 bed / 1 bath</option>
+<option value="2_2">2 bed / 2 bath</option>
+<option value="3_2">3+ bed / 2+ bath</option>
+</select>
+<span aria-hidden="true" class="chev">▾</span>
+</label>
+<button aria-label="Search" class="search__go" type="submit">
+              →
+            </button>
+</div>
+</form>
+</div>
+</section>
+<!-- Explore -->
+<section class="section">
+<div class="container">
+<h2 class="section__title">Explore SLO Rentals</h2>
+<p class="section__sub">Browse rental listings across San Luis Obispo neighborhoods</p>
+<div aria-label="Map of SLO rentals" class="gmapwrap">
+<div aria-label="Google map showing San Luis Obispo rentals" class="gmap" id="homeGmap" role="application"></div>
+</div>
+<div class="neighborhoods">
+<a class="neighborhood" data-hood="calpoly" href="#">Cal Poly Area</a>
+<a class="neighborhood" data-hood="downtown" href="#">Downtown</a>
+<a class="neighborhood" data-hood="laguna" href="#">Laguna Lake</a>
+<a class="neighborhood" data-hood="irish" href="#">Irish Hills</a>
+<a class="neighborhood" data-hood="johnson" href="#">Johnson Ave</a>
+<a class="neighborhood" data-hood="broad" href="#">Broad Street</a>
+</div>
+</div>
+</section>
+<!-- Best Rated -->
+<section class="section section--muted">
+<div class="container">
+<h2 class="section__title">Top Rated Properties</h2>
+<p class="section__sub">Highest rated rentals in San Luis Obispo based on tenant reviews</p>
+<div class="cards">
+<!-- Card 1 -->
+<article class="card" data-hood="calpoly">
+<div class="card__meta">
+<div>
+<h3 class="card__title">Mustang Village</h3>
+<p class="card__sub">24 Reviews</p>
+</div>
+<div class="rating rating--high">
+<span class="rating__num">4.5</span>
+</div>
+</div>
+<div aria-label="Mustang Village apartments" class="card__img card__img--1" role="img"></div>
+<div class="card__tags">
+<span class="tag">Near Cal Poly</span>
+<span class="tag">Student Friendly</span>
+</div>
+</article>
+<!-- Card 2 -->
+<article class="card" data-hood="downtown">
+<div class="card__meta">
+<div>
+<h3 class="card__title">Downtown Lofts</h3>
+<p class="card__sub">18 Reviews</p>
+</div>
+<div class="rating rating--high">
+<span class="rating__num">4.3</span>
+</div>
+</div>
+<div aria-label="Downtown Lofts" class="card__img card__img--2" role="img"></div>
+<div class="card__tags">
+<span class="tag">Downtown</span>
+<span class="tag">Walkable</span>
+</div>
+</article>
+<!-- Card 3 -->
+<article class="card" data-hood="laguna">
+<div class="card__meta">
+<div>
+<h3 class="card__title">Laguna Lake Townhomes</h3>
+<p class="card__sub">15 Reviews</p>
+</div>
+<div class="rating rating--med">
+<span class="rating__num">3.8</span>
+</div>
+</div>
+<div aria-label="Laguna Lake Townhomes" class="card__img card__img--3" role="img"></div>
+<div class="card__tags">
+<span class="tag">Family Friendly</span>
+<span class="tag">Quiet</span>
+</div>
+</article>
+</div>
+<div class="cta-row">
+<a class="btn btn--outline" href="#">View All Properties</a>
+</div>
+</div>
+</section>
+<!-- Write Review CTA -->
+<section class="section section--cta" id="reviews">
+<div class="container cta__inner">
+<div class="cta__text">
+<h2 class="cta__title">Share Your Experience</h2>
+<p class="cta__desc">Help fellow renters make informed decisions. Your honest review can save someone from a bad landlord or help them find a great one.</p>
+<a class="btn" href="/write-review">Write a Review</a>
+</div>
+<div class="cta__graphic">
+<div class="review-preview">
+<div class="review-preview__stars">★★★★☆</div>
+<p class="review-preview__text">"Great landlord, always responsive to maintenance requests. The apartment was clean and well-maintained..."</p>
+<span class="review-preview__author">- Recent SLO Tenant</span>
+</div>
+</div>
+</div>
+</section>
+<!-- How It Works -->
+<section class="section" id="about">
+<div class="container">
+<h2 class="section__title">How It Works</h2>
+<p class="section__sub">Finding the right rental in SLO shouldn't be a gamble</p>
+<div class="steps">
+<a class="step step--link" href="/properties">
+<h3 class="step__title">Search</h3>
+<p class="step__desc">Browse properties by location, price, or landlord name</p>
+</a>
+<a class="step step--link" href="/properties">
+<h3 class="step__title">Read Reviews</h3>
+<p class="step__desc">See honest feedback from current and past tenants</p>
+</a>
+<a class="step step--link" href="/write-review">
+<h3 class="step__title">Share</h3>
+<p class="step__desc">Write your own review to help the SLO community</p>
+</a>
+</div>
+</div>
+</section>
+
+<script>
+  // Called by Google Maps script callback
+  function initHomeMap() {
+    const map = new google.maps.Map(document.getElementById("homeGmap"), {
+      center: { lat: 35.2828, lng: -120.6596 }, // SLO
+      zoom: 13,
+      mapTypeControl: false,
+      streetViewControl: false,
+      fullscreenControl: false,
+    });
+
+    // Optional: a few “neighborhood-ish” pins (feel free to tweak)
+    const spots = [
+      { name: "Downtown",    pos: { lat: 35.2828, lng: -120.6596 } },
+      { name: "Cal Poly",    pos: { lat: 35.3006, lng: -120.6625 } },
+      { name: "Laguna Lake", pos: { lat: 35.2680, lng: -120.6810 } },
+    ];
+
+    spots.forEach(s => {
+      const m = new google.maps.Marker({ map, position: s.pos, title: s.name });
+      m.addListener("click", () => {
+        const iw = new google.maps.InfoWindow({ content: `<b>${s.name}</b>` });
+        iw.open(map, m);
+      });
+    });
+  }
+</script>
+<script async defer
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAgv07mH0MrK1ch45I3MNLS87S6DEELllk&callback=initHomeMap">
+</script>
+</Layout>

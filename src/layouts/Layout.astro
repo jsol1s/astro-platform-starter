@@ -1,34 +1,69 @@
 ---
-import '../../src/styles/globals.css';
-import '@fontsource-variable/inter/wght.css';
-import interWoff2 from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-
-interface Props {
-    title: string;
-}
-
-const { title } = Astro.props;
+const { title = "PolyCribs", description = "", active = "" } = Astro.props;
 ---
-
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <title>{title}</title>
-        <meta name="viewport" content="width=device-width" />
-        <meta name="generator" content={Astro.generator} />
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <link rel="preload" as="font" type="font/woff2" href={interWoff2} crossorigin />
-    </head>
-    <body class="antialiased text-white bg-complementary">
-        <div class="flex flex-col min-h-screen px-6 bg-noise sm:px-12">
-            <div class="flex flex-col w-full max-w-5xl mx-auto grow">
-                <Header />
-                <main class="grow"><slot /></main>
-                <Footer />
-            </div>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    {description ? <meta name="description" content={description} /> : null}
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="icon" type="image/png" sizes="64x64" href="/images/PolyCribsLogo.png" />
+    <link rel="apple-touch-icon" href="/images/PolyCribsLogo.png" />
+  </head>
+  <body>
+    <div class="coming-soon">
+      🚧 PolyCribs is currently a prototype — features do not work yet.
+    </div>
+
+    <header class="topbar">
+      <div class="container topbar__inner">
+        <a class="brand" href="/">
+          <img class="brand__logo" src="/images/polycribs_logo-png.png" alt="PolyCribs logo" />
+          <span class="brand__name">PolyCribs</span>
+        </a>
+
+        <nav class="nav">
+          <a class="nav__link" href="/properties" aria-current={active === "properties" ? "page" : undefined}>Find Rentals</a>
+          <span class="nav__sep">|</span>
+          <a class="nav__link" href="/write-review" aria-current={active === "write-review" ? "page" : undefined}>Write a Review</a>
+          <span class="nav__sep">|</span>
+          <a class="nav__link" href="/about" aria-current={active === "about" ? "page" : undefined}>About</a>
+          <button class="menu" aria-label="Open menu" title="Menu">
+            <span></span><span></span><span></span>
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="footer">
+      <div class="container footer__inner">
+        <div class="footer__brand">
+          <img src="/images/polycribs_logo-png.png" alt="PolyCribs logo" style="height:65px;">
+          <span>PolyCribs</span>
         </div>
-    </body>
+        <div class="footer__copy">
+          © {new Date().getFullYear()} polycribs.com — All rights reserved.
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Hide topbar on scroll down, show on scroll up (used across pages)
+      let lastScroll = 0;
+      const topbar = document.querySelector(".topbar");
+      window.addEventListener("scroll", () => {
+        if (!topbar) return;
+        const y = window.pageYOffset || document.documentElement.scrollTop;
+        if (y > lastScroll && y > 80) topbar.style.transform = "translateY(-100%)";
+        else topbar.style.transform = "translateY(0)";
+        lastScroll = y;
+      });
+    </script>
+  </body>
 </html>
