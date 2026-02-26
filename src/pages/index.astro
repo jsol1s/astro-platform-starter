@@ -1,21 +1,14 @@
 ---
 import Layout from "../layouts/Layout.astro";
-
-// Import postgres for server-side DB queries
 import postgres from "postgres";
+import Listings from '../components/Listings.astro';
 
-// Get connection string from environment variable
 const connectionString = import.meta.env.DATABASE_URL;
-
 if (!connectionString) throw new Error("Missing DATABASE_URL");
 
-// Connect to Neon
 const sql = postgres(connectionString, { ssl: "require" });
-
-// Example query — adjust to your table/schema
 const listings = await sql`SELECT * FROM listings ORDER BY id DESC`;
 
-// Just for practice, create a simple message
 const explainer = "This page fetches listings from Neon and displays them below.";
 ---
 
@@ -23,12 +16,12 @@ const explainer = "This page fetches listings from Neon and displays them below.
   <h1>Home Page</h1>
   <p>{explainer}</p>
 
+  <Listings />
+
   <h2>Listings:</h2>
   <ul>
     {listings.map(listing => (
-      <li>
-        {listing.name} - ${listing.price}
-      </li>
+      <li>{listing.name} - ${listing.price}</li>
     ))}
   </ul>
 </Layout>
