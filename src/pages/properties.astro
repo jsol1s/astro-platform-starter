@@ -26,7 +26,9 @@ try {
     ORDER BY id;
   `;
 } catch (err) {
+  // don't throw — log and fall back to empty list so build doesn't fail
   console.error("DB query failed:", err);
+  properties = [];
 }
 ---
 
@@ -38,94 +40,111 @@ try {
     <h1 class="section__title">Browse Rentals</h1>
     <p class="section__sub">Explore places</p>
 
-    <div class="filters">
-      <input id="q" placeholder="Search name or address…" type="text" />
+    <div aria-label="Property filters" class="filters" role="region">
+      <input aria-label="Search by name or address" class="filters__input" id="q" placeholder="Search name or address…" type="text"/>
 
-      <select id="area">
-        <option value="">All areas</option>
-        <option value="calpoly">Cal Poly Area</option>
-        <option value="downtown">Downtown</option>
-        <option value="laguna">Laguna Lake</option>
-        <option value="irish">Irish Hills</option>
-        <option value="johnson">Johnson Ave</option>
-        <option value="broad">Broad Street</option>
-        <option value="airport">SLO Airport Area</option>
-      </select>
+      <label class="filters__label">
+        <select aria-label="Filter by area" class="filters__select" id="area">
+          <option value="">All areas</option>
+          <option value="calpoly">Cal Poly Area</option>
+          <option value="downtown">Downtown</option>
+          <option value="laguna">Laguna Lake</option>
+          <option value="irish">Irish Hills</option>
+          <option value="johnson">Johnson Ave</option>
+          <option value="broad">Broad Street</option>
+          <option value="airport">SLO Airport Area</option>
+        </select>
+        <span aria-hidden="true" class="chev">▾</span>
+      </label>
 
-      <select id="price">
-        <option value="">Any price</option>
-        <option value="0-1500">Under $1,500</option>
-        <option value="1500-2000">$1,500 - $2,000</option>
-        <option value="2000-2500">$2,000 - $2,500</option>
-        <option value="2500-3000">$2,500 - $3,000</option>
-        <option value="3000+">$3,000+</option>
-      </select>
+      <label class="filters__label">
+        <select aria-label="Filter by price" class="filters__select" id="price">
+          <option value="">Any price</option>
+          <option value="0-1500">Under $1,500</option>
+          <option value="1500-2000">$1,500 - $2,000</option>
+          <option value="2000-2500">$2,000 - $2,500</option>
+          <option value="2500-3000">$2,500 - $3,000</option>
+          <option value="3000+">$3,000+</option>
+        </select>
+        <span aria-hidden="true" class="chev">▾</span>
+      </label>
 
-      <button id="clear" type="button">Clear</button>
+      <button class="filters__clear" id="clear" type="button">Clear</button>
     </div>
 
-    <div>
+    <div aria-live="polite" class="resultsbar">
       <span id="count"></span>
     </div>
 
-    <div id="list"></div>
+    <div class="plist" id="list" role="list"></div>
 
   </div>
 </section>
 
-<!-- Inject DB data -->
+<!-- Inject DB data into the browser BEFORE the client script -->
 <script is:inline define:vars={{ properties }}>
   window.POLYCRIBS = window.POLYCRIBS || {};
   window.POLYCRIBS.PROPERTIES = properties;
 </script>
 
 <script>
-  const PROPERTIES =
-    window.POLYCRIBS && window.POLYCRIBS.PROPERTIES
-      ? window.POLYCRIBS.PROPERTIES
-      : [];
+  // Read injected data (safe fallback to empty array)
+  var PROPERTIES = (window.POLYCRIBS && window.POLYCRIBS.PROPERTIES) ? window.POLYCRIBS.PROPERTIES : [];
 
-  const els = {
-    q: document.getElementById("q"),
-    area: document.getElementById("area"),
-    price: document.getElementById("price"),
-    clear: document.getElementById("clear"),
-    list: document.getElementById("list"),
-    count: document.getElementById("count"),
+  var els = {
+    q: document.getElementById('q'),
+    area: document.getElementById('area'),
+    price: document.getElementById('price'),
+    clear: document.getElementById('clear'),
+    list: document.getElementById('list'),
+    count: document.getElementById('count'),
   };
 
-  function formatMoney(n) {
-    return "$" + Number(n).toLocaleString();
+  function fmtMoney(n) {
+    if (n === null || n === undefined) return "";
+    return "$" + Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 });
   }
 
-  function matchesText(p, q) {
+  function areaLabel(key) {
+    var map = {
+      calpoly: 'Cal Poly Area',
+      downtown: 'Downtown',
+      laguna: 'Laguna Lake',
+      irish: 'Irish Hills',
+      johnson: 'Johnson Ave',
+      broad: 'Broad Street',
+      airport: 'SLO Airport Area'
+    };
+    return map[key] || key || "";
+  }
+
+  function matchText(p, q) {
     if (!q) return true;
-    return (p.name + " " + p.address)
-      .toLowerCase()
-      .includes(q.toLowerCase());
+    var t = q.trim().toLowerCase();
+    var hay = ((p.name || "") + " " + (p.address || "")).toLowerCase();
+    return hay.indexOf(t) !== -1;
   }
 
   function inPriceRange(price, range) {
     if (!range) return true;
-
-    if (range.endsWith("+")) {
-      return price >= parseInt(range);
+    if (range.indexOf('+') !== -1) {
+      var min = parseInt(range.replace('+',''), 10) || 0;
+      return price >= min;
     }
-
-    const parts = range.split("-");
-    const low = parseInt(parts[0]);
-    const high = parseInt(parts[1]);
-
-    return price >= low && price <= high;
+    var parts = range.split('-');
+    if (parts.length !== 2) return true;
+    var lo = parseInt(parts[0], 10) || 0;
+    var hi = parseInt(parts[1], 10) || 0;
+    return price >= lo && price <= hi;
   }
 
-  function filterProperties() {
-    const q = els.q.value;
-    const area = els.area.value;
-    const price = els.price.value;
+  function filterProps() {
+    var q = els.q.value;
+    var area = els.area.value;
+    var price = els.price.value;
 
-    return PROPERTIES.filter(function (p) {
-      if (!matchesText(p, q)) return false;
+    return PROPERTIES.filter(function(p) {
+      if (!matchText(p, q)) return false;
       if (area && p.area !== area) return false;
       if (!inPriceRange(p.price, price)) return false;
       return true;
@@ -133,21 +152,39 @@ try {
   }
 
   function render(list) {
-    els.list.innerHTML = "";
+    els.list.innerHTML = '';
 
-    for (let i = 0; i < list.length; i++) {
-      const p = list[i];
+    for (var i = 0; i < list.length; i++) {
+      var p = list[i];
 
-      const item = document.createElement("div");
+      var article = document.createElement('article');
+      article.className = 'pitem';
+      article.setAttribute('role','listitem');
 
-      item.innerHTML =
-        "<a href=\"/property?id=" + p.id + "\">" +
-        "<h3>" + p.name + "</h3>" +
-        "<div>" + formatMoney(p.price) + " /mo</div>" +
-        "<div>" + p.address + "</div>" +
-        "</a>";
+      var href = '/property?id=' + encodeURIComponent(p.id || '');
+      var addr = p.address || '';
+      var price = fmtMoney(p.price);
 
-      els.list.appendChild(item);
+      var inner = '<a class="pitem__main pitem__link" href="' + href + '">' +
+                  '<div class="pitem__top">' +
+                    '<h3 class="pitem__title">' + (p.name || '') + '</h3>' +
+                    '<span class="pitem__price">' + price + '/mo</span>' +
+                  '</div>' +
+                  '<div class="pitem__meta">' +
+                    '<span class="pill">' + areaLabel(p.area) + '</span>' +
+                    '<span class="pitem__addr">' + addr + '</span>' +
+                  '</div>' +
+                  '</a>' +
+                  '<div class="pitem__side">' +
+                    '<div class="pitem__rating" aria-label="Rating ' + (p.rating || 0) + ' out of 5">' +
+                      '<span class="pitem__ratingnum">' + (Number(p.rating || 0).toFixed(1)) + '</span>' +
+                      '<span class="pitem__stars">' + (new Array(Math.floor(p.rating || 0) + 1).join('★')) + '</span>' +
+                    '</div>' +
+                    '<a class="btn btn--outline pitem__btn" href="/write-review?property=' + encodeURIComponent(p.name || '') + '&address=' + encodeURIComponent(addr) + '">Write a review</a>' +
+                  '</div>';
+
+      article.innerHTML = inner;
+      els.list.appendChild(article);
     }
 
     if (list.length === 1) {
@@ -158,21 +195,22 @@ try {
   }
 
   function refresh() {
-    const filtered = filterProperties();
-    render(filtered);
+    var out = filterProps();
+    render(out);
   }
 
-  els.q.addEventListener("input", refresh);
-  els.area.addEventListener("change", refresh);
-  els.price.addEventListener("change", refresh);
-
-  els.clear.addEventListener("click", function () {
-    els.q.value = "";
-    els.area.value = "";
-    els.price.value = "";
+  // wire events
+  if (els.q) els.q.addEventListener('input', refresh);
+  if (els.area) els.area.addEventListener('change', refresh);
+  if (els.price) els.price.addEventListener('change', refresh);
+  if (els.clear) els.clear.addEventListener('click', function() {
+    els.q.value = '';
+    els.area.value = '';
+    els.price.value = '';
     refresh();
   });
 
+  // initial render
   refresh();
 </script>
 
