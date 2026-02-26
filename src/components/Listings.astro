@@ -1,0 +1,87 @@
+---
+const listings = [
+  {
+    title: "Modern Downtown Apartment",
+    price: "$2,400/mo",
+    beds: "2 bed · 1 bath",
+    location: "123 Main St, San Luis Obispo, CA",
+    image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400"
+  },
+  {
+    title: "Cozy Studio Near Campus",
+    price: "$1,200/mo",
+    beds: "Studio · 1 bath",
+    location: "456 Higuera St, San Luis Obispo, CA",
+    image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400"
+  }
+];
+
+let visible = false;
+---
+
+<button id="toggle-btn">Show Listings</button>
+
+<div id="listings" style="display: none;">
+  {listings.map(l => (
+    <div class="card">
+      <img src={l.image} alt={l.title} />
+      <h2>{l.title}</h2>
+      <p class="price">{l.price}</p>
+      <p>{l.beds}</p>
+      <p>{l.location}</p>
+    </div>
+  ))}
+</div>
+
+<script>
+  const btn = document.getElementById("toggle-btn");
+  const listings = document.getElementById("listings");
+
+  btn.addEventListener("click", () => {
+    const isHidden = listings.style.display === "none";
+    listings.style.display = isHidden ? "flex" : "none";
+    btn.textContent = isHidden ? "Hide Listings" : "Show Listings";
+  });
+</script>
+
+<style>
+  button {
+    padding: 12px 24px;
+    background: #4f46e5;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+
+  #listings {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .card {
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    overflow: hidden;
+    width: 300px;
+  }
+
+  .card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+  }
+
+  .card h2, .card p {
+    margin: 8px 16px;
+  }
+
+  .price {
+    font-weight: bold;
+    color: #4f46e5;
+    font-size: 18px;
+  }
+</style>
