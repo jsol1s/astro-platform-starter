@@ -6,30 +6,174 @@ const title = "PolyCribs - Rentals & Reviews in San Luis Obispo";
 const description =
   "Browse reviewed rentals in San Luis Obispo. Filter by price, area, beds, and baths.";
 
+const sql = neon();
+
 let properties = [];
+
 try {
-  const sql = neon();
-  properties = await sql`SELECT * FROM your_table_name ORDER BY id`;
+  properties = await sql`
+    SELECT
+      id::text        AS id,
+      title           AS name,
+      LOWER(location) AS area,
+      price::numeric  AS price,
+      0               AS beds,
+      0               AS baths,
+      0               AS rating,
+      0               AS reviews,
+      description     AS address
+    FROM listings
+    ORDER BY id;
+  `;
 } catch (err) {
   console.error("DB query failed:", err);
-  properties = [];
 }
 ---
 
 <Layout title={title} description={description} active="properties">
-  <!-- your HTML stays the same -->
 
-  <!-- REMOVE data.js if you’re using DB data -->
-  <script is:inline define:vars={{ properties }}>
-    window.POLYCRIBS = window.POLYCRIBS || {};
-    window.POLYCRIBS.PROPERTIES = properties;
-  </script>
+<section class="section">
+  <div class="container">
 
-  <script>
-    const PROPERTIES =
-      window.POLYCRIBS && window.POLYCRIBS.PROPERTIES ? window.POLYCRIBS.PROPERTIES : [];
-    // ...rest of your existing script...
-  </script>
+    <h1 class="section__title">Browse Rentals</h1>
+    <p class="section__sub">Explore places</p>
 
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAgv07mH0MrK1ch45I3MNLS87S6DEELllk&callback=initMap"></script>
+    <div class="filters">
+      <input id="q" placeholder="Search name or address…" type="text" />
+
+      <select id="area">
+        <option value="">All areas</option>
+        <option value="calpoly">Cal Poly Area</option>
+        <option value="downtown">Downtown</option>
+        <option value="laguna">Laguna Lake</option>
+        <option value="irish">Irish Hills</option>
+        <option value="johnson">Johnson Ave</option>
+        <option value="broad">Broad Street</option>
+        <option value="airport">SLO Airport Area</option>
+      </select>
+
+      <select id="price">
+        <option value="">Any price</option>
+        <option value="0-1500">Under $1,500</option>
+        <option value="1500-2000">$1,500 - $2,000</option>
+        <option value="2000-2500">$2,000 - $2,500</option>
+        <option value="2500-3000">$2,500 - $3,000</option>
+        <option value="3000+">$3,000+</option>
+      </select>
+
+      <button id="clear" type="button">Clear</button>
+    </div>
+
+    <div>
+      <span id="count"></span>
+    </div>
+
+    <div id="list"></div>
+
+  </div>
+</section>
+
+<!-- Inject DB data -->
+<script is:inline define:vars={{ properties }}>
+  window.POLYCRIBS = window.POLYCRIBS || {};
+  window.POLYCRIBS.PROPERTIES = properties;
+</script>
+
+<script>
+  const PROPERTIES =
+    window.POLYCRIBS && window.POLYCRIBS.PROPERTIES
+      ? window.POLYCRIBS.PROPERTIES
+      : [];
+
+  const els = {
+    q: document.getElementById("q"),
+    area: document.getElementById("area"),
+    price: document.getElementById("price"),
+    clear: document.getElementById("clear"),
+    list: document.getElementById("list"),
+    count: document.getElementById("count"),
+  };
+
+  function formatMoney(n) {
+    return "$" + Number(n).toLocaleString();
+  }
+
+  function matchesText(p, q) {
+    if (!q) return true;
+    return (p.name + " " + p.address)
+      .toLowerCase()
+      .includes(q.toLowerCase());
+  }
+
+  function inPriceRange(price, range) {
+    if (!range) return true;
+
+    if (range.endsWith("+")) {
+      return price >= parseInt(range);
+    }
+
+    const parts = range.split("-");
+    const low = parseInt(parts[0]);
+    const high = parseInt(parts[1]);
+
+    return price >= low && price <= high;
+  }
+
+  function filterProperties() {
+    const q = els.q.value;
+    const area = els.area.value;
+    const price = els.price.value;
+
+    return PROPERTIES.filter(function (p) {
+      if (!matchesText(p, q)) return false;
+      if (area && p.area !== area) return false;
+      if (!inPriceRange(p.price, price)) return false;
+      return true;
+    });
+  }
+
+  function render(list) {
+    els.list.innerHTML = "";
+
+    for (let i = 0; i < list.length; i++) {
+      const p = list[i];
+
+      const item = document.createElement("div");
+
+      item.innerHTML =
+        "<a href=\"/property?id=" + p.id + "\">" +
+        "<h3>" + p.name + "</h3>" +
+        "<div>" + formatMoney(p.price) + " /mo</div>" +
+        "<div>" + p.address + "</div>" +
+        "</a>";
+
+      els.list.appendChild(item);
+    }
+
+    if (list.length === 1) {
+      els.count.textContent = "Showing 1 place";
+    } else {
+      els.count.textContent = "Showing " + list.length + " places";
+    }
+  }
+
+  function refresh() {
+    const filtered = filterProperties();
+    render(filtered);
+  }
+
+  els.q.addEventListener("input", refresh);
+  els.area.addEventListener("change", refresh);
+  els.price.addEventListener("change", refresh);
+
+  els.clear.addEventListener("click", function () {
+    els.q.value = "";
+    els.area.value = "";
+    els.price.value = "";
+    refresh();
+  });
+
+  refresh();
+</script>
+
 </Layout>
