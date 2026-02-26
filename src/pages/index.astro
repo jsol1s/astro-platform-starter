@@ -1,27 +1,17 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Markdown from "../components/Markdown.astro";
+import { neon } from "@netlify/neon";
 
 const explainer = `...`;
 
-const API_BASE = import.meta.env.NEON_API_URL;
-const NEON_KEY = import.meta.env.NEON_API_KEY;
+let listings = [];
 
-if (!API_BASE) throw new Error("Missing env var: NEON_API_URL");
-if (!NEON_KEY) throw new Error("Missing env var: NEON_API_KEY");
-
-const res = await fetch(`${API_BASE}/listings`, {
-  headers: {
-    apikey: NEON_KEY,
-    Authorization: `Bearer ${NEON_KEY}`,
-    "Content-Type": "application/json",
-  },
-});
-
-if (!res.ok) {
-  const text = await res.text();
-  throw new Error(`Failed to fetch listings: ${res.status} ${res.statusText}\n${text}`);
+try {
+  const sql = neon();
+  listings = await sql`SELECT * FROM listings ORDER BY created_at DESC`;
+} catch (err) {
+  console.error("Failed to fetch listings:", err);
+  listings = []; // Don't break the build
 }
-
-const listings = await res.json();
 ---
