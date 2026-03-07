@@ -1,200 +1,226 @@
 ---
-import Layout from "../layouts/Layout.astro";
-import { neon } from "@netlify/neon";
+import Layout from '../layouts/Layout.astro';
 
-const title = "PolyCribs - Property";
-const description =
-  "Rental property details and tenant reviews in San Luis Obispo.";
-
-let properties = [];
-let reviews = [];
-
-try {
-  const sql = neon();
-
-  // 🔹 Adjust table names if needed
-  properties = await sql`
-    SELECT 
-      id,
-      name,
-      area,
-      price,
-      beds,
-      baths,
-      rating,
-      reviews,
-      address
-    FROM listings
-  `;
-
-  reviews = await sql`
-    SELECT *
-    FROM reviews
-  `;
-} catch (err) {
-  console.error("DB query failed:", err);
-}
+const title = 'PolyCribs - Property';
+const description = 'Rental property details and tenant reviews in San Luis Obispo.';
 ---
 
-<Layout title={title} description={description} active="">
-<section class="section">
-<div class="container">
-<div class="phead">
-<div>
-<h1 class="phead__title" id="pName">Loading…</h1>
-<p class="phead__meta" id="pMeta"></p>
-<p class="phead__addr" id="pAddr"></p>
-</div>
-<div class="phead__side">
-<div class="prating" id="pRating"></div>
-<a class="btn btn--outline" href="/write-review" id="writeReviewBtn">Write a Review</a>
-</div>
-</div>
+<Layout title={title} description={description}>
+  <section class="section">
+    <div class="container">
+      <div class="phead">
+        <div>
+          <h1 class="phead__title" id="pName">Loading…</h1>
+          <p class="phead__meta" id="pMeta"></p>
+          <p class="phead__addr" id="pAddr"></p>
+        </div>
+        <div class="phead__side">
+          <div class="prating" id="pRating"></div>
+          <a class="btn btn--outline" href="/write-review" id="writeReviewBtn">Write a Review</a>
+        </div>
+      </div>
 
-<div class="pgrid">
-<section class="pbox">
-<h2 class="pbox__title">Overview</h2>
-<p class="pbox__text" id="pDesc"></p>
-<div class="pstats" id="pStats"></div>
-</section>
+      <div class="container units-wrap">
+        <h2 class="section__title units-title">Available Units</h2>
+        <div class="units" id="unitsList"></div>
+      </div>
 
-<section class="pbox">
-<h2 class="pbox__title">Rating breakdown</h2>
-<div class="breakdown" id="breakdown"></div>
-</section>
-</div>
-</div>
-</section>
+      <div class="pgrid">
+        <section class="pbox">
+          <h2 class="pbox__title">Overview</h2>
+          <p class="pbox__text" id="pDesc"></p>
+          <div class="pstats" id="pStats"></div>
+        </section>
+        <section class="pbox">
+          <h2 class="pbox__title">Rating breakdown</h2>
+          <div class="breakdown" id="breakdown"></div>
+        </section>
+      </div>
+    </div>
+  </section>
 
-<section class="section section--muted">
-<div class="container">
-<div class="prow__head">
-<h2 class="section__title" style="margin:0">Reviews</h2>
-<p class="section__sub" id="reviewCount" style="margin:8px 0 0"></p>
-</div>
-<div class="reviews" id="reviewsList"></div>
-</div>
-</section>
+  <section class="section section--muted">
+    <div class="container">
+      <div class="prow__head">
+        <h2 class="section__title" style="margin:0">Reviews</h2>
+        <p class="section__sub" id="reviewCount" style="margin:8px 0 0"></p>
+      </div>
+      <div class="reviews" id="reviewsList"></div>
+    </div>
+  </section>
 
-<section class="section">
-<div class="container">
-<h2 class="section__title">Nearby properties</h2>
-<p class="section__sub">More rentals in the same area</p>
-<div class="nearby" id="nearby"></div>
-</div>
-</section>
+  <section class="section">
+    <div class="container">
+      <h2 class="section__title">Nearby properties</h2>
+      <p class="section__sub">More rentals in the same area</p>
+      <div class="nearby" id="nearby"></div>
+    </div>
+  </section>
 
-<!-- Inject DB data into browser -->
-<script is:inline define:vars={{ properties, reviews }}>
-  window.POLYCRIBS = window.POLYCRIBS || {};
-  window.POLYCRIBS.PROPERTIES = properties;
-  window.POLYCRIBS.REVIEWS = reviews;
-</script>
+  <script>
+    const PROPERTIES = [
+      {
+        id: 'chorro-001',
+        name: 'Chorro Street House',
+        address: '123 Chorro St, San Luis Obispo, CA',
+        area: 'downtown',
+        price: 2800,
+        beds: 3,
+        baths: 2,
+        rating: 4.6,
+        reviews: 5,
+        units: [
+          { type: '1 Bed', price: 1800 },
+          { type: '2 Bed', price: 2400 },
+          { type: 'Loft', price: 2100 },
+        ],
+      },
+    ];
 
-<script>
-const params = new URLSearchParams(window.location.search);
-const id = params.get("id");
+    const REVIEWS = [
+      {
+        property_id: 'chorro-001',
+        rating: 5,
+        text: 'Solid place. Quiet at night and management was responsive.',
+      },
+      {
+        property_id: 'chorro-001',
+        rating: 4,
+        text: 'Good location downtown. Parking can be tight, but overall worth it.',
+      },
+    ];
 
-const PROPERTIES = window.POLYCRIBS?.PROPERTIES || [];
-const REVIEWS = window.POLYCRIBS?.REVIEWS || [];
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+    const p = PROPERTIES.find((x) => String(x.id) === String(id));
 
-const p = PROPERTIES.find(x => String(x.id) === String(id));
+    const elName = document.getElementById('pName');
+    const elMeta = document.getElementById('pMeta');
+    const elAddr = document.getElementById('pAddr');
+    const elDesc = document.getElementById('pDesc');
+    const elStats = document.getElementById('pStats');
+    const elRating = document.getElementById('pRating');
+    const elBreakdown = document.getElementById('breakdown');
+    const elReviews = document.getElementById('reviewsList');
+    const elReviewCount = document.getElementById('reviewCount');
+    const elNearby = document.getElementById('nearby');
+    const elWrite = document.getElementById('writeReviewBtn');
+    const elUnits = document.getElementById('unitsList');
 
-const elName = document.getElementById("pName");
-const elMeta = document.getElementById("pMeta");
-const elAddr = document.getElementById("pAddr");
-const elDesc = document.getElementById("pDesc");
-const elStats = document.getElementById("pStats");
-const elRating = document.getElementById("pRating");
-const elBreakdown = document.getElementById("breakdown");
-const elReviews = document.getElementById("reviewsList");
-const elReviewCount = document.getElementById("reviewCount");
-const elNearby = document.getElementById("nearby");
-const elWrite = document.getElementById("writeReviewBtn");
+    function areaLabel(code) {
+      const map = {
+        calpoly: 'Cal Poly Area',
+        downtown: 'Downtown',
+        laguna: 'Laguna Lake',
+        irish: 'Irish Hills',
+        johnson: 'Johnson Ave',
+        broad: 'Broad Street',
+        airport: 'SLO Airport Area',
+      };
+      return map[code] || code || '';
+    }
 
-function areaLabel(code){
-  const map = {
-    calpoly: "Cal Poly Area",
-    downtown: "Downtown",
-    laguna: "Laguna Lake",
-    irish: "Irish Hills",
-    johnson: "Johnson Ave",
-    broad: "Broad Street",
-    airport: "SLO Airport Area"
-  };
-  return map[code] || code || "";
-}
+    function money(n) {
+      if (n === null || n === undefined || n === '') return '';
+      return '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 }) + '/mo';
+    }
 
-function money(n){
-  return n ? "$" + Number(n).toLocaleString() + "/mo" : "";
-}
+    function stars(n) {
+      const full = Math.floor(n);
+      const half = n - full >= 0.5;
+      const empty = Math.max(0, 5 - full - (half ? 1 : 0));
+      return '★'.repeat(full) + (half ? '½' : '') + '☆'.repeat(empty);
+    }
 
-function stars(n){
-  const full = Math.floor(n);
-  const half = (n - full) >= 0.5;
-  return "★".repeat(full) +
-    (half ? "½" : "") +
-    "☆".repeat(Math.max(0, 5 - full - (half ? 1 : 0)));
-}
+    function ratingBreakdown(list) {
+      const counts = [0, 0, 0, 0, 0];
+      list.forEach((r) => {
+        const k = Math.max(1, Math.min(5, Math.round(r.rating)));
+        counts[k - 1] += 1;
+      });
+      const total = list.length || 1;
 
-if (!p){
-  document.title = "Property not found";
-  elName.textContent = "Property not found";
-  elMeta.textContent = "That listing doesn't exist.";
-  elWrite.href = "/properties";
-} else {
+      return [5, 4, 3, 2, 1]
+        .map((star) => {
+          const c = counts[star - 1];
+          const pct = Math.round((c / total) * 100);
+          return `
+            <div class="breakdown__row">
+              <div class="breakdown__label">${star}★</div>
+              <div class="breakdown__bar"><span style="width:${pct}%"></span></div>
+              <div class="breakdown__pct">${pct}%</div>
+            </div>
+          `;
+        })
+        .join('');
+    }
 
-  document.title = `PolyCribs - ${p.name}`;
+    if (!p) {
+      document.title = 'Property not found';
+      elName.textContent = 'Property not found';
+      elMeta.textContent = "That listing doesn't exist.";
+      elAddr.textContent = '';
+      elDesc.textContent = '';
+      elStats.innerHTML = '<div class="muted">No property details available.</div>';
+      elRating.innerHTML = '';
+      elBreakdown.innerHTML = '';
+      elReviewCount.textContent = '';
+      elReviews.innerHTML = '';
+      elNearby.innerHTML = '';
+      elUnits.innerHTML = '<div class="muted">No unit breakdown available.</div>';
+      elWrite.href = '/properties';
+    } else {
+      document.title = `PolyCribs - ${p.name}`;
+      elName.textContent = p.name;
+      elMeta.textContent = `${areaLabel(p.area)} • ${money(p.price)} • ${p.beds} bd / ${p.baths} ba`;
+      elAddr.textContent = p.address || '';
+      elDesc.textContent = 'A community-reviewed rental listing on PolyCribs.';
 
-  elName.textContent = p.name;
-  elMeta.textContent =
-    `${areaLabel(p.area)} • ${money(p.price)} • ${p.beds} bd / ${p.baths} ba`;
+      elStats.innerHTML = `
+        <div class="pstat"><span>Price</span><span>${money(p.price)}</span></div>
+        <div class="pstat"><span>Beds</span><span>${p.beds}</span></div>
+        <div class="pstat"><span>Baths</span><span>${p.baths}</span></div>
+      `;
 
-  elAddr.textContent = p.address || "";
-  elDesc.textContent =
-    "A community-reviewed rental listing on PolyCribs.";
+      elRating.innerHTML = `
+        <div>${Number(p.rating).toFixed(1)}</div>
+        <div>${stars(p.rating)}</div>
+        <div>${p.reviews} reviews</div>
+      `;
 
-  elStats.innerHTML = `
-    <div class="pstat"><span>Price</span><span>${money(p.price)}</span></div>
-    <div class="pstat"><span>Beds</span><span>${p.beds}</span></div>
-    <div class="pstat"><span>Baths</span><span>${p.baths}</span></div>
-  `;
+      elWrite.href = '/write-review?property=' + encodeURIComponent(p.name) + '&address=' + encodeURIComponent(p.address || '');
 
-  elRating.innerHTML = `
-    <div>${Number(p.rating).toFixed(1)}</div>
-    <div>${stars(p.rating)}</div>
-    <div>${p.reviews} reviews</div>
-  `;
+      const list = REVIEWS.filter((r) => String(r.property_id) === String(p.id));
+      elReviewCount.textContent = list.length === 1 ? '1 review' : `${list.length} reviews`;
+      elReviews.innerHTML = '';
 
-  const list = REVIEWS.filter(r => String(r.property_id) === String(p.id));
+      list.forEach((r) => {
+        const art = document.createElement('article');
+        art.className = 'review';
+        art.innerHTML = `
+          <div><b>${p.name}</b> — ${stars(r.rating)}</div>
+          <p>"${r.text}"</p>
+        `;
+        elReviews.appendChild(art);
+      });
 
-  elReviewCount.textContent = `${list.length} reviews`;
+      elBreakdown.innerHTML = ratingBreakdown(list);
+      elNearby.innerHTML = '<div class="muted">No nearby properties yet.</div>';
 
-  list.slice(0,25).forEach(r => {
-    const art = document.createElement("article");
-    art.className = "review";
-    art.innerHTML = `
-      <div><b>${p.name}</b> — ${stars(r.rating)}</div>
-      <p>"${r.text}"</p>
-    `;
-    elReviews.appendChild(art);
-  });
-
-  const sameArea = PROPERTIES
-    .filter(x => x.area === p.area && x.id !== p.id)
-    .slice(0, 6);
-
-  sameArea.forEach(x => {
-    const a = document.createElement("a");
-    a.className = "nearby__item";
-    a.href = `/property?id=${x.id}`;
-    a.innerHTML = `
-      <div>${x.name}</div>
-      <div>${areaLabel(x.area)} • ${money(x.price)}</div>
-    `;
-    elNearby.appendChild(a);
-  });
-}
-</script>
-
+      if (p.units && p.units.length) {
+        elUnits.innerHTML = p.units
+          .map(
+            (u) => `
+              <div class="unit">
+                <div class="unit__type">${u.type}</div>
+                <div class="unit__price">$${Number(u.price).toLocaleString()}/mo</div>
+              </div>
+            `,
+          )
+          .join('');
+      } else {
+        elUnits.innerHTML = '<div class="muted">No unit breakdown available.</div>';
+      }
+    }
+  </script>
 </Layout>

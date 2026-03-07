@@ -1,38 +1,54 @@
 ---
-const { title = "PolyCribs", description = "", active = "" } = Astro.props;
+import '../styles/global.css';
 
+interface Props {
+  title?: string;
+  description?: string;
+  active?: 'home' | 'properties' | 'write-review' | 'about';
+}
 
-import "../styles/styles.css";
+const {
+  title = 'PolyCribs',
+  description = 'PolyCribs',
+  active,
+} = Astro.props;
+
+const navHref = {
+  home: '/',
+  properties: '/properties',
+  'write-review': '/write-review',
+  about: '/about',
+};
 ---
-<!doctype html>
+
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
-    {description ? <meta name="description" content={description} /> : null}
+    <meta name="description" content={description} />
     <link rel="icon" type="image/png" sizes="64x64" href="/images/PolyCribsLogo.png" />
     <link rel="apple-touch-icon" href="/images/PolyCribsLogo.png" />
   </head>
   <body>
     <div class="coming-soon">
-      🚧 PolyCribs is currently a prototype — features do not work yet.
+      🚧 PolyCribs is currently a prototype &mdash; features do not work yet.
     </div>
 
     <header class="topbar">
       <div class="container topbar__inner">
-        <a class="brand" href="/">
-          <img class="brand__logo" src="/images/polycribs_logo-png.png" alt="PolyCribs logo" />
+        <a class="brand" href={navHref.home}>
+          <img alt="PolyCribs logo" class="brand__logo" src="/images/polycribs_logo-png.png" />
           <span class="brand__name">PolyCribs</span>
         </a>
 
         <nav class="nav">
-          <a class="nav__link" href="/properties" aria-current={active === "properties" ? "page" : undefined}>Find Rentals</a>
+          <a aria-current={active === 'properties' ? 'page' : undefined} class="nav__link" href={navHref.properties}>Find Rentals</a>
           <span class="nav__sep">|</span>
-          <a class="nav__link" href="/write-review" aria-current={active === "write-review" ? "page" : undefined}>Write a Review</a>
+          <a aria-current={active === 'write-review' ? 'page' : undefined} class="nav__link" href={navHref['write-review']}>Write a Review</a>
           <span class="nav__sep">|</span>
-          <a class="nav__link" href="/about" aria-current={active === "about" ? "page" : undefined}>About</a>
-          <button class="menu" aria-label="Open menu" title="Menu">
+          <a aria-current={active === 'about' ? 'page' : undefined} class="nav__link" href={navHref.about}>About</a>
+          <button aria-label="Open menu" class="menu" title="Menu">
             <span></span><span></span><span></span>
           </button>
         </nav>
@@ -46,24 +62,25 @@ import "../styles/styles.css";
     <footer class="footer">
       <div class="container footer__inner">
         <div class="footer__brand">
-          <img src="/images/polycribs_logo-png.png" alt="PolyCribs logo" style="height:65px;">
+          <img alt="PolyCribs logo" src="/images/polycribs_logo-png.png" style="height:65px;" />
           <span>PolyCribs</span>
         </div>
         <div class="footer__copy">
-          © {new Date().getFullYear()} polycribs.com — All rights reserved.
+          &copy; <span id="year"></span> polycribs.com &mdash; All rights reserved.
         </div>
       </div>
     </footer>
 
     <script>
-      // Hide topbar on scroll down, show on scroll up (used across pages)
+      document.getElementById('year').textContent = String(new Date().getFullYear());
+
       let lastScroll = 0;
-      const topbar = document.querySelector(".topbar");
-      window.addEventListener("scroll", () => {
+      const topbar = document.querySelector('.topbar');
+
+      window.addEventListener('scroll', () => {
         if (!topbar) return;
         const y = window.pageYOffset || document.documentElement.scrollTop;
-        if (y > lastScroll && y > 80) topbar.style.transform = "translateY(-100%)";
-        else topbar.style.transform = "translateY(0)";
+        topbar.style.transform = y > lastScroll && y > 80 ? 'translateY(-100%)' : 'translateY(0)';
         lastScroll = y;
       });
     </script>
