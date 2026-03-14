@@ -4,18 +4,33 @@ import Layout from '../layouts/Layout.astro';
 const title = 'PolyCribs - Rentals & Reviews in San Luis Obispo';
 const description = 'Browse reviewed rentals in San Luis Obispo. Filter by price, area, beds, and baths.';
 
-
 const API_BASE = import.meta.env.NEON_API_URL;
 const NEON_KEY = import.meta.env.NEON_API_KEY;
 
-const res = await fetch(`${API_BASE}/listings`, {
-  headers: {
-    apikey: NEON_KEY,
-    Authorization: `Bearer ${NEON_KEY}`,
-  },
-});
+let listings = [];
 
-const listings = await res.json();
+try {
+  if (!API_BASE || !NEON_KEY) {
+    throw new Error('Missing Neon environment variables');
+  }
+
+  const res = await fetch(`${API_BASE}/listings`, {
+    headers: {
+      apikey: NEON_KEY,
+      Authorization: `Bearer ${NEON_KEY}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch listings: ${res.status} ${res.statusText}`);
+  }
+
+  const data = await res.json();
+  listings = Array.isArray(data) ? data : [];
+} catch (err) {
+  console.error('Failed to load listings:', err);
+  listings = [];
+}
 ---
 
 <Layout title={title} description={description} active="properties">
@@ -65,7 +80,7 @@ const listings = await res.json();
   </section>
 
   <script define:vars={{ listings }}>
-    const PROPERTIES = listings;
+    const PROPERTIES = Array.isArray(listings) ? listings : [];
 
     const els = {
       q: document.getElementById('q'),
@@ -102,16 +117,20 @@ const listings = await res.json();
     }
 
     function inPriceRange(price, range) {
+      const value = Number(price) || 0;
       if (!range) return true;
+
       if (range.endsWith('+')) {
         const min = parseInt(range.replace('+', ''), 10) || 0;
-        return price >= min;
+        return value >= min;
       }
+
       const parts = range.split('-');
       if (parts.length !== 2) return true;
+
       const lo = parseInt(parts[0], 10) || 0;
       const hi = parseInt(parts[1], 10) || 0;
-      return price >= lo && price <= hi;
+      return value >= lo && value <= hi;
     }
 
     function filterProps() {
@@ -130,34 +149,40 @@ const listings = await res.json();
     function render(list) {
       els.list.innerHTML = '';
 
+      if (!list.length) {
+        els.list.innerHTML = '<div class="muted">No properties found.</div>';
+        els.count.textContent = 'Showing 0 places';
+        return;
+      }
+
       list.forEach((p) => {
         const item = document.createElement('article');
         item.className = 'pitem';
         item.setAttribute('role', 'listitem');
 
         item.innerHTML = `
-          <a class="pitem__main pitem__link" href="/property?id=${encodeURIComponent(p.id)}">
+          <a class="pitem__main pitem__link" href="/property?id=${encodeURIComponent(p.id || '')}">
             <div class="pitem__top">
-              <h3 class="pitem__title">${p.name}</h3>
+              <h3 class="pitem__title">${p.name || 'Untitled Property'}</h3>
               <div class="pitem__pricewrap">
                 <span class="pitem__price">${fmtMoney(p.price)}/mo</span>
               </div>
             </div>
             <div class="pitem__meta">
               <span class="pill">${areaLabel(p.area)}</span>
-              <span class="pitem__addr">${p.address}</span>
+              <span class="pitem__addr">${p.address || ''}</span>
             </div>
             <div class="pitem__meta2">
-              <span class="pill pill--soft">${p.beds} bd · ${p.baths} ba</span>
-              <span class="pitem__reviews">${p.reviews} review${p.reviews === 1 ? '' : 's'}</span>
+              <span class="pill pill--soft">${p.beds ?? 0} bd · ${p.baths ?? 0} ba</span>
+              <span class="pitem__reviews">${p.reviews ?? 0} review${p.reviews === 1 ? '' : 's'}</span>
             </div>
           </a>
           <div class="pitem__side">
-            <div class="pitem__rating" aria-label="Rating ${p.rating} out of 5">
-              <span class="pitem__ratingnum">${Number(p.rating).toFixed(1)}</span>
-              <span class="pitem__stars">${'★'.repeat(Math.floor(p.rating))}</span>
+            <div class="pitem__rating" aria-label="Rating ${p.rating ?? 0} out of 5">
+              <span class="pitem__ratingnum">${Number(p.rating ?? 0).toFixed(1)}</span>
+              <span class="pitem__stars">${'★'.repeat(Math.floor(Number(p.rating ?? 0)))}</span>
             </div>
-            <a class="btn btn--outline pitem__btn" href="/write-review?property=${encodeURIComponent(p.name)}&address=${encodeURIComponent(p.address)}">
+            <a class="btn btn--outline pitem__btn" href="/write-review?property=${encodeURIComponent(p.name || '')}&address=${encodeURIComponent(p.address || '')}">
               Write a review
             </a>
           </div>

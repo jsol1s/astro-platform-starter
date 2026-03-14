@@ -3,6 +3,11 @@ import Layout from '../layouts/Layout.astro';
 
 const title = 'PolyCribs - San Luis Obispo Rental & Landlord Reviews';
 const description = 'PolyCribs helps you find honest reviews of landlords and rental properties in San Luis Obispo. Read reviews from real tenants before signing your lease.';
+
+const MAPS_KEY = import.meta.env.PUBLIC_GOOGLE_MAPS_KEY;
+const mapsScriptSrc = MAPS_KEY
+  ? `https://maps.googleapis.com/maps/api/js?key=${MAPS_KEY}&callback=initHomeMap`
+  : '';
 ---
 
 <Layout title={title} description={description} active="home">
@@ -237,5 +242,13 @@ const description = 'PolyCribs helps you find honest reviews of landlords and re
 
     window.initHomeMap = initHomeMap;
   </script>
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&callback=initHomeMap"></script>
+
+  {mapsScriptSrc && (
+    <script
+      async
+      defer
+      is:inline
+      src={mapsScriptSrc}>
+    </script>
+  )}
 </Layout>
