@@ -243,6 +243,107 @@ const mapsScriptSrc = MAPS_KEY
     window.initHomeMap = initHomeMap;
   </script>
 
+  <script>
+  function initHomeMap() {
+    const mapElement = document.getElementById('homeGmap');
+    if (!mapElement || typeof google === 'undefined' || !google.maps) return;
+
+    const map = new google.maps.Map(mapElement, {
+      center: { lat: 35.2828, lng: -120.6596 },
+      zoom: 13,
+      mapTypeControl: false,
+      streetViewControl: false,
+      fullscreenControl: false,
+    });
+
+    const spots = {
+      mustang: {
+        name: 'Mustang Village',
+        pos: { lat: 35.3026, lng: -120.6587 },
+        details: 'Near Cal Poly • Student Friendly • 4.5★',
+      },
+      downtownlofts: {
+        name: 'Downtown Lofts',
+        pos: { lat: 35.2796, lng: -120.663 },
+        details: 'Downtown • Walkable • 4.3★',
+      },
+      lagunalake: {
+        name: 'Laguna Lake Townhomes',
+        pos: { lat: 35.27, lng: -120.6832 },
+        details: 'Quiet • Family Friendly • 3.8★',
+      },
+    };
+
+    const greenPin = {
+      path: google.maps.SymbolPath.CIRCLE,
+      fillColor: '#1f5d2c',
+      fillOpacity: 1,
+      strokeColor: '#ffffff',
+      strokeWeight: 3,
+      scale: 9,
+    };
+
+    const info = new google.maps.InfoWindow();
+    const markers = {};
+
+    Object.entries(spots).forEach(([key, s]) => {
+      const marker = new google.maps.Marker({
+        map,
+        position: s.pos,
+        title: s.name,
+        icon: greenPin,
+      });
+
+      markers[key] = marker;
+
+      marker.addListener('click', () => {
+        info.setContent(`<b>${s.name}</b><br/>${s.details}`);
+        info.open(map, marker);
+      });
+    });
+
+    document.querySelectorAll('.popular-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const key = btn.getAttribute('data-spot');
+        const s = key ? spots[key] : null;
+        const marker = key ? markers[key] : null;
+        if (!s || !marker) return;
+
+        map.panTo(s.pos);
+        map.setZoom(14);
+        info.setContent(`<b>${s.name}</b><br/>${s.details}`);
+        info.open(map, marker);
+      });
+    });
+  }
+
+  function initHeroBackgroundSwap() {
+    const heroBg = document.querySelector('.hero__bg');
+    if (!heroBg) return;
+
+    const images = [
+      '/images/california_street.jpg',
+      '/images/houses.jpg',
+      '/images/beach.jpg',
+    ];
+
+    let index = 0;
+
+    heroBg.style.backgroundImage = `url("${images[index]}")`;
+    heroBg.style.backgroundSize = 'cover';
+    heroBg.style.backgroundPosition = 'center';
+    heroBg.style.backgroundRepeat = 'no-repeat';
+
+    setInterval(() => {
+      index = (index + 1) % images.length;
+      heroBg.style.backgroundImage = `url("${images[index]}")`;
+    }, 5000);
+  }
+
+  window.initHomeMap = initHomeMap;
+  initHeroBackgroundSwap();
+</script>
+
   {mapsScriptSrc && (
     <script
       async

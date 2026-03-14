@@ -1702,3 +1702,7 @@ body {
     radial-gradient(circle at 85% 40%, rgba(31,93,44,.035), transparent 50%),
     #ffffff;
 }
+
+.hero__bg {
+  transition: background-image 0.8s ease-in-out;
+}
