@@ -3,6 +3,19 @@ import Layout from '../layouts/Layout.astro';
 
 const title = 'PolyCribs - Rentals & Reviews in San Luis Obispo';
 const description = 'Browse reviewed rentals in San Luis Obispo. Filter by price, area, beds, and baths.';
+
+
+const API_BASE = import.meta.env.NEON_API_URL;
+const NEON_KEY = import.meta.env.NEON_API_KEY;
+
+const res = await fetch(`${API_BASE}/listings`, {
+  headers: {
+    apikey: NEON_KEY,
+    Authorization: `Bearer ${NEON_KEY}`,
+  },
+});
+
+const listings = await res.json();
 ---
 
 <Layout title={title} description={description} active="properties">
@@ -51,20 +64,8 @@ const description = 'Browse reviewed rentals in San Luis Obispo. Filter by price
     </div>
   </section>
 
-  <script>
-    const PROPERTIES = [
-      {
-        id: 'chorro-001',
-        name: 'Chorro Street House',
-        address: '123 Chorro St, San Luis Obispo, CA',
-        area: 'downtown',
-        price: 2800,
-        beds: 3,
-        baths: 2,
-        rating: 4.6,
-        reviews: 5,
-      },
-    ];
+  <script define:vars={{ listings }}>
+    const PROPERTIES = listings;
 
     const els = {
       q: document.getElementById('q'),
