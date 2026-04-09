@@ -171,8 +171,9 @@ const description = 'Write a rental review on PolyCribs. Help SLO renters make b
       if (el) el.hidden = !show;
     }
 
-    reviewForm?.addEventListener('submit', (e) => {
+    reviewForm?.addEventListener('submit', async (e) => {
       e.preventDefault();
+
       const property = propertyInput.value.trim();
       const landlord = document.getElementById('landlord').value.trim();
       const review = document.getElementById('review').value.trim();
@@ -186,7 +187,38 @@ const description = 'Write a rental review on PolyCribs. Help SLO renters make b
       setError('err_rating', !rating);
 
       if (property && landlord && review.length >= 40 && when && rating) {
-        alert('Prototype only: review captured locally, but submission is not connected yet.');
+        const data = {
+          property,
+          address: addressInput.value.trim(),
+          landlord,
+          rating,
+          review,
+          when,
+          verified: document.getElementById('verified').checked
+        };
+
+        try {
+          const res = await fetch('/api/reviews', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+          });
+
+          if (!res.ok) {
+            throw new Error('Failed to submit review');
+          }
+
+          alert('Review submitted!');
+          localStorage.removeItem('polycribs-review-draft');
+          reviewForm.reset();
+          updateStars(0);
+          updateProgress();
+        } catch (err) {
+          console.error(err);
+          alert('There was a problem submitting your review.');
+        }
       }
     });
 
